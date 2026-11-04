@@ -6,11 +6,9 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ShieldCheck,
-  Building2,
   ArrowRight,
   AlertCircle,
-  CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { SessionUser } from "@/lib/types";
 
@@ -35,12 +33,12 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, rememberMe }),
+        body: JSON.stringify({ email: email.trim(), password, rememberMe }),
       });
 
       const data = await res.json();
       if (!res.ok || data.error) {
-        setErrorMessage(data.error || "Login failed. Check your credentials.");
+        setErrorMessage(data.error || "Invalid ID or Password. Please try again.");
       } else if (data.user) {
         onLoginSuccess(data.user);
       }
@@ -52,197 +50,151 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
-        {/* Left Hero Pane (5 Cols on large) */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-[#0B44BA] via-[#1254D8] to-[#1E3A8A] text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
-          {/* Subtle decorative glow */}
-          <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Top Branding */}
-          <div className="relative z-10 space-y-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M6 10L11 26L16 14L21 26L26 14L30 26"
-                    stroke="#FFFFFF"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="11" cy="9" r="2.5" fill="#FFFFFF" />
-                  <circle cx="21" cy="9" r="2.5" fill="#FFFFFF" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-lg font-extrabold tracking-tight text-white flex items-center">
-                  <span>Walnut Medical</span>
-                  <span className="text-[10px] text-blue-200 font-normal ml-0.5">&reg;</span>
-                </h1>
-                <p className="text-xs text-blue-200 font-medium">R&amp;D Procurement Portal</p>
-              </div>
-            </div>
-
-            <div className="inline-block bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono font-semibold text-blue-100 border border-white/15">
-              DOC. NO. WMPL-QAS-025-01A &bull; REV 00
-            </div>
+    <div className="min-h-screen bg-[#F1F5F9] flex flex-col justify-center items-center p-4 sm:p-6 font-sans">
+      {/* Centered Login Card */}
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200/90 p-8 sm:p-10 space-y-7">
+        {/* Header / Logo */}
+        <div className="text-center space-y-3">
+          {/* Walnut Medical Emblem */}
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1254D8] text-white shadow-lg shadow-blue-500/25 mx-auto">
+            <svg
+              className="w-8 h-8 text-white"
+              viewBox="0 0 36 36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 10L11 26L16 14L21 26L26 14L30 26"
+                stroke="#FFFFFF"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="11" cy="9" r="2.5" fill="#FFFFFF" />
+              <circle cx="21" cy="9" r="2.5" fill="#FFFFFF" />
+            </svg>
           </div>
 
-          {/* Mid Section: SOP Process Highlights */}
-          <div className="relative z-10 py-6 space-y-4">
-            <h2 className="text-sm font-extrabold text-white tracking-wide uppercase">
-              Standard Operating Procedure
-            </h2>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex items-start space-x-3 bg-white/5 p-2.5 rounded-xl border border-white/10">
-                <div className="w-5 h-5 rounded-full bg-blue-400/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-blue-300 font-bold text-[11px]">1</span>
-                </div>
-                <div>
-                  <div className="font-bold text-white">Phase 1 &amp; 2: Request &amp; Approvals</div>
-                  <div className="text-[11px] text-blue-200">
-                    BOM / Tool templates with multi-tier price threshold routing.
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3 bg-white/5 p-2.5 rounded-xl border border-white/10">
-                <div className="w-5 h-5 rounded-full bg-emerald-400/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-emerald-300 font-bold text-[11px]">3</span>
-                </div>
-                <div>
-                  <div className="font-bold text-white">Phase 3: Sourcing &amp; PO Issuance</div>
-                  <div className="text-[11px] text-blue-200">
-                    Cost check, lead time analysis &amp; alternate part validation.
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3 bg-white/5 p-2.5 rounded-xl border border-white/10">
-                <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-amber-300 font-bold text-[11px]">4</span>
-                </div>
-                <div>
-                  <div className="font-bold text-white">Phase 4 &amp; 5: Tracking &amp; Feedback</div>
-                  <div className="text-[11px] text-blue-200">
-                    Live courier tracking, EDD &le; 7 days alert &amp; QA sign-off.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Footer Info */}
-          <div className="relative z-10 pt-4 border-t border-white/15 text-[10px] text-blue-200 flex items-center justify-between">
-            <span>Mohali Unit &ndash; 160055</span>
-            <span>ISO 13485 Certified</span>
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-1">
+              <span>Walnut Medical</span>
+              <span className="text-xs text-blue-600 font-semibold align-top">&reg;</span>
+            </h1>
+            <p className="text-xs text-slate-500 font-semibold mt-1 uppercase tracking-wider">
+              R&amp;D Procurement Portal
+            </p>
           </div>
         </div>
 
-        {/* Right Form Pane (7 Cols on large) */}
-        <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between">
-          <div className="max-w-md w-full mx-auto space-y-6">
-            {/* Form Title */}
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                Sign in to your account
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Enter your Walnut Medical credentials to access the R&amp;D portal.
-              </p>
+        {/* Title */}
+        <div className="text-center">
+          <h2 className="text-lg font-extrabold text-slate-900">Sign In</h2>
+          <p className="text-xs text-slate-500 mt-1">
+            Enter your employee ID and password to access the portal
+          </p>
+        </div>
+
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs flex items-center gap-2.5 animate-in fade-in duration-150">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span className="font-medium">{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          {/* Email / ID Field */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              Email / Employee ID
+            </label>
+            <div className="relative flex items-center">
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+              <input
+                type="text"
+                required
+                autoFocus
+                placeholder="name@walnutmedical.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 text-xs bg-[#F8FAFC] border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] font-medium transition-all placeholder:text-slate-400"
+              />
             </div>
+          </div>
 
-            {/* Error Message */}
-            {errorMessage && (
-              <div className="bg-rose-50 border border-rose-300 text-rose-800 p-3.5 rounded-2xl text-xs flex items-center gap-2.5 animate-in fade-in duration-100">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{errorMessage}</span>
-              </div>
-            )}
-
-            {/* Login Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
-              {/* Email / ID Field */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Email Address / Employee ID
-                </label>
-                <div className="relative flex items-center">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="name@walnutmedical.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-[#F8FAFC] border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] font-medium transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-700">Password</label>
-                  <span className="text-[11px] text-blue-600 font-semibold cursor-pointer hover:underline">
-                    Forgot password?
-                  </span>
-                </div>
-                <div className="relative flex items-center">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    placeholder="••••••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-[#F8FAFC] border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] font-medium transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 p-1"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Remember Me */}
-              <div className="flex items-center justify-between text-xs pt-1">
-                <label className="flex items-center space-x-2 text-slate-600 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded-sm border-slate-300 text-[#1254D8] focus:ring-[#1254D8]"
-                  />
-                  <span className="font-medium">Remember me on this device</span>
-                </label>
-              </div>
-
-              {/* Sign In Button */}
+          {/* Password Field */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold text-slate-700">Password</label>
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 bg-[#1254D8] hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer mt-2"
+                type="button"
+                onClick={() => alert("Please contact IT administrator or your R&D lead to reset your password.")}
+                className="text-[11px] text-blue-600 font-semibold hover:underline"
               >
-                <span>{loading ? "Authenticating..." : "Sign In to Portal"}</span>
-                <ArrowRight className="w-4 h-4" />
+                Forgot password?
               </button>
-            </form>
+            </div>
+            <div className="relative flex items-center">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-10 py-3 text-xs bg-[#F8FAFC] border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] font-medium transition-all placeholder:text-slate-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 text-slate-400 hover:text-slate-600 p-1"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
-          {/* Security Disclaimer */}
-          <div className="text-center text-[10px] text-slate-400 pt-6">
-            Walnut Medical Portal &bull; Enterprise Single Sign-On Ready &bull; SOP WMPL-QAS-025-01A
+          {/* Remember Me */}
+          <div className="flex items-center text-xs pt-1">
+            <label className="flex items-center space-x-2 text-slate-600 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded-sm border-slate-300 text-[#1254D8] focus:ring-[#1254D8]"
+              />
+              <span className="font-medium text-slate-700">Remember me</span>
+            </label>
           </div>
+
+          {/* Sign In Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3.5 px-4 bg-[#1254D8] hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-60 cursor-pointer mt-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In to Portal</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Footer info */}
+        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400 space-y-1">
+          <div>DOC. NO. WMPL-QAS-025-01A &bull; REV 00</div>
+          <div>Walnut Medical &bull; Mohali Unit &ndash; 160055</div>
         </div>
       </div>
     </div>
   );
 }
-
