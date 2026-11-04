@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  role        String   // REQUESTER | APPROVER_TIER1 | APPROVER_TIER2 | APPROVER_TIER3 | BUSINESS | STORE_QA | ADMIN
+  designation String
+  department  String
+  createdAt   DateTime @default(now())
+
+  requests    ProcurementRequest[]
+  approvals   ApprovalLog[]
+}
+
+model ProcurementRequest {
+  id                          String         @id @default(cuid())
+  requestNumber               String         @unique
+  requestType                 String         // TOOL_EQUIPMENT | BOM_PARTS
+  title                       String
+  justification               String?
+  requesterId                 String
+  requester                   User           @relation(fields: [requesterId], references: [id])
+  status                      String         // DRAFT | PENDING_APPROVAL | APPROVED | SOURCING | ORDER_PLACED | INWARD_INSPECTION | DELIVERED | CLOSED | REJECTED
+  currentPhase                String         // PHASE_1 | PHASE_2 | PHASE_3 | PHASE_4 | PHASE_5
+  totalEstimatedCost          Float?
+  currency                    String         @default("INR")
+  technicalValidationRequired Boolean        @default(false)
+  rejectionReason             String?
+  rejectedBy                  String?
+  rejectedAt                  DateTime?
+  createdAt                   DateTime       @default(now())
+  updatedAt                   DateTime       @updatedAt
+
+  items                       RequestItem[]
+  approvals                   ApprovalLog[]
+  purchaseOrder               PurchaseOrder?
+}
+
+model RequestItem {
+  id                 String          @id @default(cuid())
+  requestId          String
+  request            ProcurementRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  partNumber         String
+  partName           String
+  quantity           Int
+  datasheetUrl       String?
+  datasheetFileName  String?
+  optionalSource     String?
+  estimatedUnitPrice Float?
+  finalUnitPrice     Float?
+  status             String          @default("ACTIVE") // ACTIVE | REPLACED_BY_ALTERNATE | CANCELLED
+  alternates         AlternatePart[]
+}
+
+model AlternatePart {
+  id                        String      @id @default(cuid())
+  originalItemId            String
+  originalItem              RequestItem @relation(fields: [originalItemId], references: [id], onDelete: Cascade)
+  proposedPartNumber        String
+  proposedPartName          String
+  alternateDatasheetUrl     String?
+  alternateDatasheetFileName String?
+  alternatePrice            Float?
+  proposerNotes             String?
+  proposedBy                String?
+  rndApprovalStatus         String      @default("PENDING") // PENDING | APPROVED | REJECTED
+  rndReviewerId             String?
+  rndRemarks                String?
+  createdAt                 DateTime    @default(now())
+}
+
+model ApprovalLog {
+  id          String             @id @default(cuid())
+  requestId   String
+  request     ProcurementRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  approverId  String
+  approver    User               @relation(fields: [approverId], references: [id])
+  roleName    String
+  stage       String             // PRICE_ROUTING | THREE_TIER_TECHNICAL | THREE_TIER_BUSINESS | COST_EVAL | LEAD_TIME
+  decision    String             // APPROVED | REJECTED | REROUTED
+  comments    String?
+  createdAt   DateTime           @default(now())
+}
+
+model PurchaseOrder {
+  id             String          @id @default(cuid())
+  requestId      String          @unique
+  request        ProcurementRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  poNumber       String
+  supplierName   String
+  supplierEmail  String?
+  supplierPhone  String?
+  orderDate      DateTime        @default(now())
+  initialEdd     DateTime
+  currentEdd     DateTime
+  totalAmount    Float
+  currency       String          @default("INR")
+  poDocumentUrl  String?
+  trackingNumber String?
+  courierName    String?
+  trackingUrl    String?
+  status         String          @default("ORDER_PLACED") // ORDER_PLACED | IN_TRANSIT | DELAYED | ARRIVED
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  trackingUpdates TrackingUpdate[]
+  inwardHandover  InwardHandover?
+}
+
+model TrackingUpdate {
+  id              String        @id @default(cuid())
+  poId            String
+  purchaseOrder   PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  previousEdd     DateTime?
+  newEdd          DateTime?
+  delayReason     String?       // Mandatory when EDD changes
+  followupNotes   String
+  loggedByUserId  String?
+  createdAt       DateTime      @default(now())
+}
+
+model InwardHandover {
+  id                     String           @id @default(cuid())
+  poId                   String           @unique
+  purchaseOrder          PurchaseOrder    @relation(fields: [poId], references: [id], onDelete: Cascade)
+  receivedDate           DateTime         @default(now())
+  storeInspectorId       String?
+  packagingOk            Boolean          @default(true)
+  quantityOk             Boolean          @default(true)
+  specsMatched           Boolean          @default(true)
+  inspectionNotes        String?
+  handoverSignedByUserId String?
+  handoverSignature      String?
+  handoverTimestamp      DateTime?
+
+  feedback               ClosureFeedback?
+}
+
+model ClosureFeedback {
+  id                 String         @id @default(cuid())
+  handoverId         String         @unique
+  inwardHandover     InwardHandover @relation(fields: [handoverId], references: [id], onDelete: Cascade)
+  qualityRating      Int            // 1-5
+  specsVerification  String         // PASSED | FAILED | CONCESSION
+  fulfillmentRating  Int            // 1-5
+  feedbackComments   String
+  submittedByUserId  String
+  submittedAt        DateTime       @default(now())
+}
+
