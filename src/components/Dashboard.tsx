@@ -147,6 +147,8 @@ export default function Dashboard() {
           onOpenNewRequest={() => setIsNewRequestOpen(true)}
           onOpenSopModal={() => setIsSopOpen(true)}
           onLogout={handleLogout}
+          requests={requests}
+          onSelectRequest={setSelectedRequest}
         />
 
         {/* 3. Main Dynamic Content */}
