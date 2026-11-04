@@ -11,6 +11,7 @@ import {
   FileText,
   Building2,
   Check,
+  LogOut,
 } from "lucide-react";
 
 interface TopHeaderProps {
@@ -21,6 +22,7 @@ interface TopHeaderProps {
   onSearchChange: (q: string) => void;
   onOpenNewRequest: () => void;
   onOpenSopModal: () => void;
+  onLogout?: () => void;
 }
 
 export default function TopHeader({
@@ -31,6 +33,7 @@ export default function TopHeader({
   onSearchChange,
   onOpenNewRequest,
   onOpenSopModal,
+  onLogout,
 }: TopHeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -170,6 +173,22 @@ export default function TopHeader({
                   );
                 })}
               </div>
+
+              {/* Sign Out Button */}
+              {onLogout && (
+                <div className="pt-1.5 border-t border-slate-100 px-2 mt-1">
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      onLogout();
+                    }}
+                    className="w-full flex items-center space-x-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -12,6 +12,7 @@ import InspectionView from "./InspectionView";
 import SopModal from "./SopModal";
 import NewRequestModal from "./NewRequestModal";
 import RequestDetailModal from "./RequestDetailModal";
+import LoginPage from "./LoginPage";
 import { SessionUser } from "@/lib/types";
 
 export default function Dashboard() {
@@ -19,7 +20,7 @@ export default function Dashboard() {
   const [users, setUsers] = useState<SessionUser[]>([]);
   const [currentUser, setCurrentUser] = useState<SessionUser | null>(null);
   const [requests, setRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [authChecking, setAuthChecking] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
@@ -27,7 +28,29 @@ export default function Dashboard() {
   const [isNewRequestOpen, setIsNewRequestOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
-  const fetchData = async () => {
+  // Check initial authentication
+  const checkAuthAndFetch = async () => {
+    try {
+      // 1. Check if session cookie exists
+      const meRes = await fetch("/api/auth/me");
+      const meData = await meRes.json();
+
+      if (meData.user) {
+        setCurrentUser(meData.user);
+        // Fetch dashboard data
+        await fetchAppData();
+      } else {
+        setCurrentUser(null);
+      }
+    } catch (err) {
+      console.error("Auth check error:", err);
+      setCurrentUser(null);
+    } finally {
+      setAuthChecking(false);
+    }
+  };
+
+  const fetchAppData = async () => {
     try {
       const [usersRes, reqsRes] = await Promise.all([
         fetch("/api/users"),
@@ -38,24 +61,53 @@ export default function Dashboard() {
 
       if (usersData.users) {
         setUsers(usersData.users);
-        if (!currentUser && usersData.users.length > 0) {
-          // Default to Abhishek Saini matching the screenshot
-          setCurrentUser(usersData.users[0]);
-        }
       }
       if (reqsData.requests) {
         setRequests(reqsData.requests);
       }
     } catch (err) {
       console.error("Dashboard fetch error:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    checkAuthAndFetch();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Logout error:", e);
+    } finally {
+      setCurrentUser(null);
+      setRequests([]);
+    }
+  };
+
+  // If still checking session on first render
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="w-9 h-9 rounded-full border-3 border-blue-600 border-t-transparent animate-spin" />
+          <div className="text-xs font-bold text-slate-600">Loading Walnut Medical Portal...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show professional login page
+  if (!currentUser) {
+    return (
+      <LoginPage
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          fetchAppData();
+        }}
+      />
+    );
+  }
 
   const pendingApprovalsCount = requests.filter(
     (r) => r.status === "PENDING_APPROVAL" || r.currentPhase === "PHASE_2"
@@ -84,21 +136,22 @@ export default function Dashboard() {
 
       {/* 2. Main Wrapper */}
       <div className="flex-1 flex flex-col min-w-0">
-        {currentUser && (
-          <TopHeader
-            currentUser={currentUser}
-            users={users}
-            onSelectUser={setCurrentUser}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onOpenNewRequest={() => setIsNewRequestOpen(true)}
-            onOpenSopModal={() => setIsSopOpen(true)}
-          />
-        )}
+        <TopHeader
+          currentUser={currentUser}
+          users={users}
+          onSelectUser={(u) => {
+            setCurrentUser(u);
+          }}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onOpenNewRequest={() => setIsNewRequestOpen(true)}
+          onOpenSopModal={() => setIsSopOpen(true)}
+          onLogout={handleLogout}
+        />
 
         {/* 3. Main Dynamic Content */}
         <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
-          {currentNav === "dashboard" && currentUser && (
+          {currentNav === "dashboard" && (
             <DashboardView
               currentUser={currentUser}
               requests={filteredRequests}
@@ -114,7 +167,7 @@ export default function Dashboard() {
             />
           )}
 
-          {currentNav === "requests" && currentUser && (
+          {currentNav === "requests" && (
             <RequestsView
               currentUser={currentUser}
               requests={filteredRequests}
@@ -123,16 +176,16 @@ export default function Dashboard() {
             />
           )}
 
-          {currentNav === "approvals" && currentUser && (
+          {currentNav === "approvals" && (
             <ApprovalsView
               currentUser={currentUser}
               requests={filteredRequests}
               onSelectRequest={setSelectedRequest}
-              onRefresh={fetchData}
+              onRefresh={fetchAppData}
             />
           )}
 
-          {currentNav === "procurement" && currentUser && (
+          {currentNav === "procurement" && (
             <ProcurementView
               currentUser={currentUser}
               requests={filteredRequests}
@@ -140,7 +193,7 @@ export default function Dashboard() {
             />
           )}
 
-          {currentNav === "tracking" && currentUser && (
+          {currentNav === "tracking" && (
             <TrackingView
               currentUser={currentUser}
               requests={filteredRequests}
@@ -148,7 +201,7 @@ export default function Dashboard() {
             />
           )}
 
-          {currentNav === "inspection" && currentUser && (
+          {currentNav === "inspection" && (
             <InspectionView
               currentUser={currentUser}
               requests={filteredRequests}
@@ -173,23 +226,21 @@ export default function Dashboard() {
       {/* Modals */}
       <SopModal isOpen={isSopOpen} onClose={() => setIsSopOpen(false)} />
 
-      {currentUser && (
-        <NewRequestModal
-          isOpen={isNewRequestOpen}
-          onClose={() => setIsNewRequestOpen(false)}
-          currentUser={currentUser}
-          onSuccess={fetchData}
-        />
-      )}
+      <NewRequestModal
+        isOpen={isNewRequestOpen}
+        onClose={() => setIsNewRequestOpen(false)}
+        currentUser={currentUser}
+        onSuccess={fetchAppData}
+      />
 
-      {selectedRequest && currentUser && (
+      {selectedRequest && (
         <RequestDetailModal
           isOpen={Boolean(selectedRequest)}
           onClose={() => setSelectedRequest(null)}
           request={selectedRequest}
           currentUser={currentUser}
           onRefresh={() => {
-            fetchData();
+            fetchAppData();
             fetch(`/api/requests/${selectedRequest.id}`)
               .then((r) => r.json())
               .then((d) => {

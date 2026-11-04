@@ -11,6 +11,7 @@ model User {
   id          String   @id @default(cuid())
   name        String
   email       String   @unique
+  password    String   @default("Walnut@2026")
   role        String   // REQUESTER | APPROVER_TIER1 | APPROVER_TIER2 | APPROVER_TIER3 | BUSINESS | STORE_QA | ADMIN
   designation String
   department  String
