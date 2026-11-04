@@ -96,7 +96,7 @@ export default function ProcurementView({
                 </div>
                 <h3 className="font-bold text-sm text-slate-900">{req.title}</h3>
                 <div className="text-xs text-slate-500">
-                  {req.items?.length || 1} parts &bull; Est. &#8377;
+                  {req.items?.length || 0} parts &bull; Est. &#8377;
                   {req.totalEstimatedCost?.toLocaleString("en-IN") || "0"} &bull; Requester:{" "}
                   {req.requester?.name}
                 </div>

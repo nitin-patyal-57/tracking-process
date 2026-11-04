@@ -89,7 +89,7 @@ export default function ApprovalsView({
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            Pending ({pendingRequests.length || 6})
+            Pending ({pendingRequests.length})
           </button>
           <button
             onClick={() => setActiveTab("approved")}
