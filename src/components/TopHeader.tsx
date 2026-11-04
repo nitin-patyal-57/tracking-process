@@ -68,13 +68,8 @@ export default function TopHeader({
             placeholder="Search by Request ID, PO, Part No. ..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-16 py-2 text-xs bg-[#F8FAFC] hover:bg-slate-100/70 focus:bg-white border border-slate-200/90 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] transition-all"
+            className="w-full pl-9 pr-4 py-2 text-xs bg-[#F8FAFC] hover:bg-slate-100/70 focus:bg-white border border-slate-200/90 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20 focus:border-[#1254D8] transition-all"
           />
-          <div className="absolute right-2.5 flex items-center">
-            <kbd className="text-[10px] font-mono text-slate-600 bg-white border border-slate-200 px-1.5 py-0.5 rounded-md shadow-2xs">
-              Ctrl + K
-            </kbd>
-          </div>
         </div>
       </div>
 
