@@ -25,10 +25,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# SQLite local database files (optional - or commit schema only)
-prisma/dev.db*
-dev.db*
-
 # OS files
 .DS_Store
 Thumbs.db
