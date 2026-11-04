@@ -188,12 +188,6 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
             )}
           </button>
         </form>
-
-        {/* Footer info */}
-        <div className="pt-4 border-t border-slate-100 text-center text-[11px] text-slate-400 space-y-1">
-          <div>DOC. NO. WMPL-QAS-025-01A &bull; REV 00</div>
-          <div>Walnut Medical &bull; Mohali Unit &ndash; 160055</div>
-        </div>
       </div>
     </div>
   );
