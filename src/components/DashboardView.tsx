@@ -106,7 +106,7 @@ export default function DashboardView({
 
         <div className="relative z-10 max-w-xl">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <span>Welcome, Abhishek</span>
+            <span>Welcome, {currentUser?.name || "User"}</span>
             <span className="text-2xl">👋</span>
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-slate-600 font-medium">
