@@ -93,48 +93,15 @@ export default function DashboardView({
   return (
     <div className="space-y-6">
       {/* 1. Hero Welcome Banner with Graphic */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EFF6FF] via-[#E0EFFF] to-[#D5E7FD] p-7 border border-blue-100/80 shadow-2xs">
-        {/* Decorative background circuit glow */}
-        <div className="absolute right-0 top-0 bottom-0 w-80 opacity-90 pointer-events-none hidden md:flex items-center justify-end pr-6">
-          <div className="relative">
-            {/* Realistic stylized PCB microchip representation */}
-            <div className="w-48 h-32 rounded-xl bg-slate-900 border-2 border-slate-700/80 shadow-2xl p-3 flex flex-col justify-between relative overflow-hidden">
-              {/* Gold Chip Pins */}
-              <div className="absolute -left-1.5 top-3 bottom-3 flex flex-col justify-between">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="w-2.5 h-1.5 bg-amber-400 rounded-xs shadow-xs" />
-                ))}
-              </div>
-              <div className="absolute -right-1.5 top-3 bottom-3 flex flex-col justify-between">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="w-2.5 h-1.5 bg-amber-400 rounded-xs shadow-xs" />
-                ))}
-              </div>
-              {/* Top and Bottom Pins */}
-              <div className="absolute -top-1.5 left-6 right-6 flex justify-between">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="w-1.5 h-2.5 bg-amber-400 rounded-xs shadow-xs" />
-                ))}
-              </div>
-              <div className="absolute -bottom-1.5 left-6 right-6 flex justify-between">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="w-1.5 h-2.5 bg-amber-400 rounded-xs shadow-xs" />
-                ))}
-              </div>
-
-              {/* IC Label */}
-              <div className="flex items-center justify-between text-slate-500 text-[9px] font-mono">
-                <span className="w-2 h-2 rounded-full border border-slate-600"></span>
-                <span>WMPL-MCU-2026</span>
-              </div>
-              <div className="text-center font-mono text-slate-200 font-bold text-xs tracking-wider">
-                WALNUT R&amp;D
-              </div>
-              <div className="text-right text-[8px] font-mono text-blue-400">
-                REV 2.1
-              </div>
-            </div>
-          </div>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EFF6FF] via-[#E0EFFF] to-[#D5E7FD] p-6 sm:p-7 border border-blue-100/80 shadow-2xs">
+        {/* Real PCB Hero Image blending seamlessly */}
+        <div className="absolute right-0 top-0 bottom-0 w-48 sm:w-72 md:w-96 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#EFF6FF] via-[#EFF6FF]/40 to-transparent z-10" />
+          <img
+            src="/13_Purpose_Products.webp"
+            alt="Walnut Medical PCB Component"
+            className="w-full h-full object-cover object-center opacity-90"
+          />
         </div>
 
         <div className="relative z-10 max-w-xl">
