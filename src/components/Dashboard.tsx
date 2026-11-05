@@ -152,7 +152,7 @@ export default function Dashboard() {
         />
 
         {/* 3. Main Dynamic Content */}
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-24 lg:p-6">
           {currentNav === "dashboard" && (
             <DashboardView
               currentUser={currentUser}

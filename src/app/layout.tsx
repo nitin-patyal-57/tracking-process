@@ -1,9 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Walnut Medical R&D Procurement & Tracking Portal",
   description: "Standard Operating Procedure WMPL-QAS-025-01A R&D Procurement and Tracking System",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -17,4 +23,3 @@ export default function RootLayout({
     </html>
   );
 }
-

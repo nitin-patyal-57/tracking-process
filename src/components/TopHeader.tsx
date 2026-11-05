@@ -156,9 +156,18 @@ export default function TopHeader({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between sticky top-0 z-20">
-      {/* Search Input Bar */}
-      <div className="flex-1 max-w-xl">
+    <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white">
+      <div className="flex items-center justify-between gap-2 px-4 py-2 lg:h-16 lg:px-6">
+        <div className="flex min-w-0 items-center gap-2 lg:hidden">
+          <img
+            src="/Walnut_Technologies_logo_transparent.webp"
+            alt="Walnut Technologies"
+            className="h-9 w-36 shrink-0 object-contain object-left"
+          />
+        </div>
+
+        {/* Desktop Search Input */}
+        <div className="hidden max-w-xl flex-1 lg:block">
         <div className="relative flex items-center">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
           <input
@@ -172,11 +181,11 @@ export default function TopHeader({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-3.5">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-3.5">
         {/* SOP Map Button */}
         <button
           onClick={onOpenSopModal}
-          className="hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50/60 rounded-xl border border-slate-200/80 transition-colors"
+          className="hidden lg:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50/60 rounded-xl border border-slate-200/80 transition-colors"
           title="View SOP WMPL-QAS-025-01A Flowchart"
         >
           <FileText className="w-3.5 h-3.5 text-blue-600" />
@@ -186,10 +195,11 @@ export default function TopHeader({
         {/* New Request Button */}
         <button
           onClick={onOpenNewRequest}
-          className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 text-xs font-bold text-white bg-[#1254D8] hover:bg-blue-700 active:bg-blue-800 rounded-xl shadow-xs shadow-blue-500/20 transition-all cursor-pointer"
+          className="inline-flex items-center space-x-1.5 rounded-xl bg-[#1254D8] px-2.5 py-2 text-xs font-bold text-white shadow-xs shadow-blue-500/20 transition-all hover:bg-blue-700 active:bg-blue-800 sm:px-3.5 sm:py-1.5"
+          aria-label="Create new request"
         >
           <Plus className="w-4 h-4" />
-          <span>New Request</span>
+        <span className="hidden sm:inline">New Request</span>
         </button>
 
         {/* Notification Bell with Dropdown Popover */}
@@ -214,7 +224,7 @@ export default function TopHeader({
 
           {/* Notifications Dropdown Panel */}
           {notifOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-0 z-50 animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-[min(24rem,calc(100vw-1rem))] sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-0 z-50 animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
               {/* Header */}
               <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -403,6 +413,21 @@ export default function TopHeader({
               )}
             </div>
           )}
+        </div>
+      </div>
+      </div>
+
+      {/* Mobile Search Input */}
+      <div className="px-4 pb-3 lg:hidden">
+        <div className="relative flex items-center">
+          <Search className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search requests or purchase orders"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full rounded-xl border border-slate-200/90 bg-[#F8FAFC] py-2.5 pl-9 pr-4 text-xs transition-all focus:border-[#1254D8] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1254D8]/20"
+          />
         </div>
       </div>
     </header>

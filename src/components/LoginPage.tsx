@@ -50,40 +50,19 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] flex flex-col justify-center items-center p-4 sm:p-6 font-sans">
+    <div className="min-h-[100svh] bg-[#F1F5F9] flex flex-col justify-center items-center p-4 sm:p-6 font-sans">
       {/* Centered Login Card */}
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200/90 p-8 sm:p-10 space-y-7">
         {/* Header / Logo */}
-        <div className="text-center space-y-3">
-          {/* Walnut Medical Emblem */}
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1254D8] text-white shadow-lg shadow-blue-500/25 mx-auto">
-            <svg
-              className="w-8 h-8 text-white"
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 10L11 26L16 14L21 26L26 14L30 26"
-                stroke="#FFFFFF"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="11" cy="9" r="2.5" fill="#FFFFFF" />
-              <circle cx="21" cy="9" r="2.5" fill="#FFFFFF" />
-            </svg>
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-1">
-              <span>Walnut Medical</span>
-              <span className="text-xs text-blue-600 font-semibold align-top">&reg;</span>
-            </h1>
-            <p className="text-xs text-slate-500 font-semibold mt-1 uppercase tracking-wider">
-              R&amp;D Procurement Portal
-            </p>
-          </div>
+        <div className="space-y-3 text-center">
+          <img
+            src="/Walnut_Technologies_logo_transparent.webp"
+            alt="Walnut Technologies"
+            className="mx-auto h-16 w-full max-w-[260px] object-contain"
+          />
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            R&amp;D Procurement Portal
+          </p>
         </div>
 
         {/* Title */}

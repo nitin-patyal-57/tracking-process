@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -12,6 +12,7 @@ import {
   Layers,
   Settings,
   ChevronDown,
+  MoreHorizontal,
 } from "lucide-react";
 
 export type NavItem =
@@ -35,6 +36,7 @@ export default function Sidebar({
   onNavigate,
   pendingApprovalsCount,
 }: SidebarProps) {
+  const [moreOpen, setMoreOpen] = useState(false);
   const mainNav = [
     { id: "dashboard" as NavItem, label: "Dashboard", icon: LayoutDashboard },
     { id: "requests" as NavItem, label: "Requests", icon: FileText },
@@ -49,31 +51,30 @@ export default function Sidebar({
     { id: "inspection" as NavItem, label: "Inward Inspection", icon: ShieldCheck },
     { id: "reports" as NavItem, label: "Reports", icon: BarChart3 },
   ];
+  const mobileNav: { id: NavItem; label: string; icon: typeof LayoutDashboard }[] = [
+    { id: "dashboard", label: "Home", icon: LayoutDashboard },
+    { id: "requests", label: "Requests", icon: FileText },
+    { id: "approvals", label: "Approvals", icon: CheckCircle2 },
+    { id: "tracking", label: "Tracking", icon: Truck },
+  ];
+  const moreNav: { id: NavItem; label: string; icon: typeof LayoutDashboard }[] = [
+    { id: "procurement", label: "Procurement", icon: ShoppingCart },
+    { id: "inspection", label: "Inward Inspection", icon: ShieldCheck },
+    { id: "reports", label: "Reports", icon: BarChart3 },
+    { id: "settings", label: "Settings", icon: Settings },
+  ];
+  const moreIsActive = moreNav.some((item) => currentNav === item.id);
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col shrink-0 min-h-screen">
+    <>
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white lg:flex lg:min-h-screen">
       {/* Brand Logo */}
-      <div className="p-5 border-b border-slate-100 flex items-center space-x-2.5">
-        {/* Walnut Medical stylized logo */}
-        <div className="flex items-center space-x-2">
-          <svg className="w-8 h-8 text-blue-600" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M6 10L11 26L16 14L21 26L26 14L30 26"
-              stroke="#1D61E7"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle cx="11" cy="9" r="2.5" fill="#1D61E7" />
-            <circle cx="21" cy="9" r="2.5" fill="#1D61E7" />
-          </svg>
-          <div>
-            <div className="text-base font-extrabold tracking-tight text-slate-900 flex items-center">
-              <span>Walnut Medical</span>
-              <span className="text-[10px] text-slate-400 font-normal ml-0.5">&reg;</span>
-            </div>
-          </div>
-        </div>
+      <div className="flex h-[76px] items-center border-b border-slate-100 px-5 py-3">
+        <img
+          src="/Walnut_Technologies_logo_transparent.webp"
+          alt="Walnut Technologies"
+          className="h-full w-full object-contain object-left"
+        />
       </div>
 
       {/* Nav Section Label */}
@@ -156,7 +157,74 @@ export default function Sidebar({
         <div>DOC: WMPL-QAS-025-01A</div>
         <div>EFFT: 01.01.2026 (REV 00)</div>
       </div>
-    </aside>
+      </aside>
+      <nav aria-label="Main navigation" className="mobile-bottom-nav lg:hidden">
+      {moreOpen && (
+        <div className="absolute bottom-[calc(100%+0.5rem)] right-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+          <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            More sections
+          </div>
+          {moreNav.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentNav === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onNavigate(item.id);
+                  setMoreOpen(false);
+                }}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold ${
+                  isActive ? "bg-blue-50 text-[#1254D8]" : "text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      {mobileNav.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentNav === item.id;
+        return (
+          <button
+            key={item.id}
+            onClick={() => {
+              onNavigate(item.id);
+              setMoreOpen(false);
+            }}
+            aria-current={isActive ? "page" : undefined}
+            className={`relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-semibold ${
+              isActive ? "text-[#1254D8]" : "text-slate-500"
+            }`}
+          >
+            <span className="relative">
+              <Icon className="h-5 w-5" />
+              {item.id === "approvals" && pendingApprovalsCount > 0 && (
+                <span className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+                  {pendingApprovalsCount}
+                </span>
+              )}
+            </span>
+            <span className="truncate">{item.label}</span>
+          </button>
+        );
+      })}
+      <button
+        onClick={() => setMoreOpen((open) => !open)}
+        aria-expanded={moreOpen}
+        aria-label="More navigation options"
+        className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-semibold ${
+          moreOpen || moreIsActive ? "text-[#1254D8]" : "text-slate-500"
+        }`}
+      >
+        <MoreHorizontal className="h-5 w-5" />
+        <span>More</span>
+      </button>
+      </nav>
+    </>
   );
 }
-
