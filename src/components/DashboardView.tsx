@@ -93,9 +93,9 @@ export default function DashboardView({
   return (
     <div className="space-y-6">
       {/* 1. Hero Welcome Banner with Graphic */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EFF6FF] via-[#E0EFFF] to-[#D5E7FD] p-6 sm:p-7 border border-blue-100/80 shadow-2xs">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#EFF6FF] via-[#E0EFFF] to-[#D5E7FD] p-4 sm:p-7 border border-blue-100/80 shadow-2xs">
         {/* Real PCB Hero Image blending seamlessly */}
-        <div className="absolute right-0 top-0 bottom-0 w-48 sm:w-72 md:w-96 overflow-hidden pointer-events-none">
+        <div className="absolute right-0 top-0 bottom-0 hidden w-28 min-[360px]:block sm:w-72 md:w-96 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 bg-gradient-to-r from-[#EFF6FF] via-[#EFF6FF]/40 to-transparent z-10" />
           <img
             src="/13_Purpose_Products.webp"
@@ -105,7 +105,7 @@ export default function DashboardView({
         </div>
 
         <div className="relative z-10 max-w-xl">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-xl min-[360px]:text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
             <span>Welcome, {currentUser?.name || "User"}</span>
             <span className="text-2xl">👋</span>
           </h1>
@@ -116,11 +116,11 @@ export default function DashboardView({
       </div>
 
       {/* 2. Process Flow Phases (5 Cards in a Row connected by arrows) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 items-center">
+      <div className="grid grid-cols-2 gap-2 min-[360px]:gap-3 sm:grid-cols-5 items-center">
         {/* Phase 1 */}
         <div
           onClick={() => onNavigateToPhase("PHASE_1")}
-          className="bg-[#EFF6FF] border border-[#DBEAFE] hover:border-blue-300 rounded-2xl p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-[#EFF6FF] border border-[#DBEAFE] hover:border-blue-300 rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="w-9 h-9 rounded-xl bg-white text-blue-600 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
             <FileText className="w-4 h-4" />
@@ -128,8 +128,8 @@ export default function DashboardView({
           <div className="text-[11px] font-bold text-blue-600 mt-2.5 uppercase tracking-wider">
             Phase 1
           </div>
-          <div className="font-extrabold text-sm text-slate-900 mt-0.5">Request</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+          <div className="font-extrabold text-xs sm:text-sm leading-tight break-words text-slate-900 mt-0.5">Request</div>
+          <div className="max-[359px]:hidden text-[11px] text-slate-500 mt-0.5 line-clamp-1">
             BOM / Tool / Equipment
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function DashboardView({
         {/* Phase 2 */}
         <div
           onClick={() => onNavigateToPhase("PHASE_2")}
-          className="bg-[#FAF5FF] border border-[#F3E8FF] hover:border-purple-300 rounded-2xl p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-[#FAF5FF] border border-[#F3E8FF] hover:border-purple-300 rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="w-9 h-9 rounded-xl bg-white text-purple-600 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
             <ShieldCheck className="w-4 h-4" />
@@ -145,8 +145,8 @@ export default function DashboardView({
           <div className="text-[11px] font-bold text-purple-600 mt-2.5 uppercase tracking-wider">
             Phase 2
           </div>
-          <div className="font-extrabold text-sm text-slate-900 mt-0.5">Approval</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+          <div className="font-extrabold text-xs sm:text-sm leading-tight break-words text-slate-900 mt-0.5">Approval</div>
+          <div className="max-[359px]:hidden text-[11px] text-slate-500 mt-0.5 line-clamp-1">
             Price Routing &amp; Tech Review
           </div>
         </div>
@@ -154,7 +154,7 @@ export default function DashboardView({
         {/* Phase 3 */}
         <div
           onClick={() => onNavigateToPhase("PHASE_3")}
-          className="bg-[#F0FDF4] border border-[#DCFCE7] hover:border-emerald-300 rounded-2xl p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-[#F0FDF4] border border-[#DCFCE7] hover:border-emerald-300 rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="w-9 h-9 rounded-xl bg-white text-emerald-600 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
             <ShoppingCart className="w-4 h-4" />
@@ -162,8 +162,8 @@ export default function DashboardView({
           <div className="text-[11px] font-bold text-emerald-600 mt-2.5 uppercase tracking-wider">
             Phase 3
           </div>
-          <div className="font-extrabold text-sm text-slate-900 mt-0.5">Procurement</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+          <div className="font-extrabold text-xs sm:text-sm leading-tight break-words text-slate-900 mt-0.5">Procurement</div>
+          <div className="max-[359px]:hidden text-[11px] text-slate-500 mt-0.5 line-clamp-1">
             Cost, Lead Time &amp; PO
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function DashboardView({
         {/* Phase 4 */}
         <div
           onClick={() => onNavigateToPhase("PHASE_4")}
-          className="bg-[#FFF7ED] border border-[#FFEDD5] hover:border-amber-300 rounded-2xl p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-[#FFF7ED] border border-[#FFEDD5] hover:border-amber-300 rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="w-9 h-9 rounded-xl bg-white text-amber-600 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
             <Truck className="w-4 h-4" />
@@ -179,8 +179,8 @@ export default function DashboardView({
           <div className="text-[11px] font-bold text-amber-600 mt-2.5 uppercase tracking-wider">
             Phase 4
           </div>
-          <div className="font-extrabold text-sm text-slate-900 mt-0.5">Tracking</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+          <div className="font-extrabold text-xs sm:text-sm leading-tight break-words text-slate-900 mt-0.5">Tracking</div>
+          <div className="max-[359px]:hidden text-[11px] text-slate-500 mt-0.5 line-clamp-1">
             Supplier Follow-up &amp; Delivery
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function DashboardView({
         {/* Phase 5 */}
         <div
           onClick={() => onNavigateToPhase("PHASE_5")}
-          className="bg-[#F0F9FF] border border-[#E0F2FE] hover:border-cyan-300 rounded-2xl p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-[#F0F9FF] border border-[#E0F2FE] hover:border-cyan-300 rounded-2xl p-2.5 sm:p-4 text-center cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="w-9 h-9 rounded-xl bg-white text-cyan-600 flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
             <Package className="w-4 h-4" />
@@ -196,15 +196,15 @@ export default function DashboardView({
           <div className="text-[11px] font-bold text-cyan-600 mt-2.5 uppercase tracking-wider">
             Phase 5
           </div>
-          <div className="font-extrabold text-sm text-slate-900 mt-0.5">Inspection</div>
-          <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+          <div className="font-extrabold text-xs sm:text-sm leading-tight break-words text-slate-900 mt-0.5">Inspection</div>
+          <div className="max-[359px]:hidden text-[11px] text-slate-500 mt-0.5 line-clamp-1">
             Inward, Handover &amp; Closure
           </div>
         </div>
       </div>
 
       {/* 3. Five KPI Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
+      <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-5 gap-3.5">
         {/* Total Requests */}
         <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-2xs flex items-center space-x-3.5">
           <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -501,4 +501,3 @@ export default function DashboardView({
     </div>
   );
 }
-
