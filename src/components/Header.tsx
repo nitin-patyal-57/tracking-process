@@ -5,7 +5,6 @@ import { UserRole, SessionUser } from "@/lib/types";
 import {
   FileSpreadsheet,
   PlusCircle,
-  FileText,
   UserCheck,
   ShieldCheck,
   Clock,
@@ -17,7 +16,6 @@ interface HeaderProps {
   users: SessionUser[];
   onSelectUser: (user: SessionUser) => void;
   onOpenNewRequest: () => void;
-  onOpenSopModal: () => void;
 }
 
 export default function Header({
@@ -25,7 +23,6 @@ export default function Header({
   users,
   onSelectUser,
   onOpenNewRequest,
-  onOpenSopModal,
 }: HeaderProps) {
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
@@ -84,16 +81,6 @@ export default function Header({
 
         {/* Action Controls & Role Switcher */}
         <div className="flex items-center flex-wrap gap-2 sm:gap-3">
-          {/* SOP Modal Trigger */}
-          <button
-            onClick={onOpenSopModal}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-300"
-            title="View standard operating flowchart"
-          >
-            <FileText className="w-3.5 h-3.5 text-blue-600" />
-            <span>SOP Flowchart</span>
-          </button>
-
           {/* New Request Button */}
           <button
             onClick={onOpenNewRequest}
@@ -139,4 +126,3 @@ export default function Header({
     </header>
   );
 }
-

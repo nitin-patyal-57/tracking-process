@@ -7,7 +7,6 @@ import {
   Bell,
   ChevronDown,
   Plus,
-  FileText,
   LogOut,
   Clock,
   ShieldCheck,
@@ -24,7 +23,6 @@ interface TopHeaderProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
   onOpenNewRequest: () => void;
-  onOpenSopModal: () => void;
   onLogout?: () => void;
   requests?: any[];
   onSelectRequest?: (req: any) => void;
@@ -37,7 +35,6 @@ export default function TopHeader({
   searchQuery,
   onSearchChange,
   onOpenNewRequest,
-  onOpenSopModal,
   onLogout,
   requests = [],
   onSelectRequest,
@@ -182,16 +179,6 @@ export default function TopHeader({
 
       {/* Right Controls */}
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-3.5">
-        {/* SOP Map Button */}
-        <button
-          onClick={onOpenSopModal}
-          className="hidden lg:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-blue-700 bg-slate-50 hover:bg-blue-50/60 rounded-xl border border-slate-200/80 transition-colors"
-          title="View SOP WMPL-QAS-025-01A Flowchart"
-        >
-          <FileText className="w-3.5 h-3.5 text-blue-600" />
-          <span>SOP Flowchart</span>
-        </button>
-
         {/* New Request Button */}
         <button
           onClick={onOpenNewRequest}

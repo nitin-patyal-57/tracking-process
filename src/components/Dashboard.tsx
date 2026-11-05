@@ -9,7 +9,6 @@ import ApprovalsView from "./ApprovalsView";
 import ProcurementView from "./ProcurementView";
 import TrackingView from "./TrackingView";
 import InspectionView from "./InspectionView";
-import SopModal from "./SopModal";
 import NewRequestModal from "./NewRequestModal";
 import RequestDetailModal from "./RequestDetailModal";
 import LoginPage from "./LoginPage";
@@ -24,7 +23,6 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modals
-  const [isSopOpen, setIsSopOpen] = useState(false);
   const [isNewRequestOpen, setIsNewRequestOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
@@ -145,7 +143,6 @@ export default function Dashboard() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onOpenNewRequest={() => setIsNewRequestOpen(true)}
-          onOpenSopModal={() => setIsSopOpen(true)}
           onLogout={handleLogout}
           requests={requests}
           onSelectRequest={setSelectedRequest}
@@ -226,8 +223,6 @@ export default function Dashboard() {
       </div>
 
       {/* Modals */}
-      <SopModal isOpen={isSopOpen} onClose={() => setIsSopOpen(false)} />
-
       <NewRequestModal
         isOpen={isNewRequestOpen}
         onClose={() => setIsNewRequestOpen(false)}

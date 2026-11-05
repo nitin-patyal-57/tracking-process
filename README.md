@@ -19,5 +19,3 @@ pnpm dev
 - **Phase 4: Live Part Tracking** (Supplier details, EDD $\le 7$ days automated alert, mandatory delay reason logging, role-based cost masking).
 - **Phase 5: Inward Inspection & Feedback Loop** (Store QA checklist, physical handover signoff, 3-point mandatory feedback, order closure).
 - **Role Switcher**: 1-click toggle between Requester, Abhishek, Jaydeep, Amol, Business Team, Store QA, and Admin.
-- **SOP Flowchart Viewer**: Built-in modal displaying the official flowchart.
-
