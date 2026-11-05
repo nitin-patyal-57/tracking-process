@@ -14,6 +14,7 @@ import {
   Package,
   CheckCircle2,
   CheckCheck,
+  Mail,
 } from "lucide-react";
 
 interface TopHeaderProps {
@@ -66,6 +67,16 @@ export default function TopHeader({
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  const roleLabels: Record<string, string> = {
+    REQUESTER: "Requester",
+    APPROVER_TIER1: "Approver · Tier 1",
+    APPROVER_TIER2: "Approver · Tier 2",
+    APPROVER_TIER3: "Approver · Tier 3",
+    BUSINESS: "Business",
+    STORE_QA: "Store QA",
+    ADMIN: "Administrator",
+  };
+  const roleLabel = roleLabels[currentUser.role] || currentUser.role.replace(/_/g, " ");
 
   // Dynamic alerts computed from requests per SOP WMPL-QAS-025-01A
   const notifications = useMemo(() => {
@@ -325,76 +336,108 @@ export default function TopHeader({
               setDropdownOpen(!dropdownOpen);
               setNotifOpen(false);
             }}
-            className="flex items-center space-x-2.5 p-1.5 pl-2 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-left cursor-pointer"
+            aria-expanded={dropdownOpen}
+            aria-haspopup="true"
+            aria-label={`Profile menu for ${currentUser.name}`}
+            className={`flex items-center gap-2 rounded-2xl border px-2 py-1.5 text-left transition-all ${
+              dropdownOpen
+                ? "border-blue-200 bg-blue-50/70 shadow-sm"
+                : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50"
+            }`}
           >
             {/* Avatar Circle */}
-            <div className="w-8 h-8 rounded-full bg-[#0F172A] text-white flex items-center justify-center text-xs font-bold tracking-tight shadow-xs">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-xs font-bold tracking-tight text-white shadow-sm ring-1 ring-white">
               {initials}
             </div>
 
             {/* Name & Designation */}
             <div className="hidden sm:block">
-              <div className="text-xs font-bold text-slate-900 leading-tight">
+              <div className="text-xs font-bold leading-tight text-slate-900">
                 {currentUser.name}
               </div>
-              <div className="text-[11px] text-slate-500 leading-tight">
+              <div className="mt-0.5 max-w-36 truncate text-[10px] leading-tight text-slate-500">
                 {currentUser.designation}
               </div>
             </div>
 
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
           </button>
 
           {/* User Profile Menu Popup */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-200/80 p-3 z-50 animate-in fade-in zoom-in-95 duration-100 space-y-3">
+            <div
+              role="dialog"
+              aria-label="Profile details"
+              aria-modal="false"
+              className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_20px_60px_-20px_rgba(15,23,42,0.32)] animate-in fade-in zoom-in-95 duration-150"
+            >
               {/* User Info Header */}
-              <div className="flex items-start space-x-3 p-2.5 bg-slate-50/80 rounded-xl border border-slate-100">
-                <div className="w-10 h-10 rounded-full bg-[#0F172A] text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">
-                  {initials}
+              <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50/80 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-sm font-bold text-white shadow-md ring-4 ring-white">
+                    {initials}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-bold text-slate-900">
+                      {currentUser.name}
+                    </div>
+                    <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                      <span className="truncate">{currentUser.email}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-bold text-slate-900 truncate">
-                    {currentUser.name}
-                  </div>
-                  <div className="text-[11px] text-slate-500 truncate">
-                    {currentUser.email}
-                  </div>
-                  <div className="text-[10px] text-blue-600 font-semibold mt-0.5 truncate">
-                    {currentUser.designation} &bull; {currentUser.department}
-                  </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <span className="truncate text-xs font-medium text-slate-600">
+                    {currentUser.designation}
+                  </span>
+                  <span className="shrink-0 rounded-full border border-blue-100 bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-blue-700">
+                    {currentUser.department}
+                  </span>
                 </div>
               </div>
 
               {/* Role & Session Status */}
-              <div className="px-2 py-1 space-y-2 text-xs">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Role:</span>
-                  <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[10px] font-mono">
-                    {currentUser.role}
+              <div className="space-y-3 px-4 py-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-semibold text-slate-700">
+                      Portal access
+                    </div>
+                    <div className="mt-1 text-[10px] text-slate-500">
+                      Permissions assigned to your account
+                    </div>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600">
+                    {roleLabel}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Session:</span>
-                  <span className="flex items-center gap-1.5 text-emerald-600 font-medium text-[10px]">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Active Secure Session
-                  </span>
+                <div className="flex items-center gap-2.5 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3 py-2.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-sm">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-semibold text-slate-800">Secure session</div>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[10px] font-medium text-emerald-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      Active on this device
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Sign Out Button */}
               {onLogout && (
-                <div className="pt-2 border-t border-slate-100">
+                <div className="border-t border-slate-100 bg-slate-50/70 p-3">
                   <button
                     onClick={() => {
                       setDropdownOpen(false);
                       onLogout();
                     }}
-                    className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50/70 hover:bg-rose-100/80 rounded-xl transition-all cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-100 bg-white px-3 py-2.5 text-xs font-semibold text-rose-600 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 active:scale-[0.99]"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign out</span>
                   </button>
                 </div>
               )}
