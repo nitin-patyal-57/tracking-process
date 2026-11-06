@@ -52,11 +52,19 @@ async function main() {
     },
     {
       id: "user_business",
+      name: "Mr. Sukhbir",
+      email: "sukhbir@walnutmedical.com",
+      role: "BUSINESS",
+      designation: "Purchase Department Head",
+      department: "Purchase Department",
+    },
+    {
+      id: "user_rajesh",
       name: "Rajesh Kumar",
       email: "rajesh.kumar@walnutmedical.com",
       role: "BUSINESS",
       designation: "Procurement & Sourcing Lead",
-      department: "Business / Procurement",
+      department: "Purchase / Procurement",
     },
     {
       id: "user_store",

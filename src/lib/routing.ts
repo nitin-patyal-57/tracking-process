@@ -58,10 +58,10 @@ export function determineApprovalRouting(
       },
       {
         assignedApproverId: "user_business",
-        assignedApproverName: "Rajesh Kumar (Business Team)",
-        assignedRoleName: "Business Team (Cost & Lead Time)",
+        assignedApproverName: "Mr. Sukhbir (Purchase Department Head)",
+        assignedRoleName: "Purchase Department Head (Cost & Lead Time)",
         ruleExplanation:
-          "BOM Three-Tier Review: Evaluation of component cost, vendor lead time, and supply availability.",
+          "BOM Three-Tier Review: Evaluation of component cost, vendor lead time, and supply availability by Purchase Department Head.",
         stage: "THREE_TIER_BUSINESS",
       },
     ];
@@ -74,10 +74,10 @@ export function determineApprovalRouting(
     return [
       {
         assignedApproverId: "user_business",
-        assignedApproverName: "Business Team",
-        assignedRoleName: "Business Team (Cost Evaluation)",
+        assignedApproverName: "Mr. Sukhbir (Purchase Department Head)",
+        assignedRoleName: "Purchase Department Head (Cost Evaluation)",
         ruleExplanation:
-          "Price was left optional/blank by requester. Routed to Business Team to evaluate & fill cost before threshold approval.",
+          "Price was left optional/blank by requester. Routed to Mr. Sukhbir (Purchase Department Head) to evaluate & fill cost before threshold approval.",
         stage: "PRICE_EVALUATION",
       },
     ];
@@ -117,4 +117,3 @@ export function determineApprovalRouting(
     },
   ];
 }
-
