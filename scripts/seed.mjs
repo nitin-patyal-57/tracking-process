@@ -52,8 +52,8 @@ async function main() {
     },
     {
       id: "user_business",
-      name: "Pooja Sharma",
-      email: "business.procurement@walnutmedical.com",
+      name: "Rajesh Kumar",
+      email: "rajesh.kumar@walnutmedical.com",
       role: "BUSINESS",
       designation: "Procurement & Sourcing Lead",
       department: "Business / Procurement",

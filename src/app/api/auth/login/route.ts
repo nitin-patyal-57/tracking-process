@@ -15,6 +15,10 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = String(email).trim().toLowerCase();
+    const isBusinessAlias =
+      cleanEmail === "business.procurement@walnutmedical.com" ||
+      cleanEmail === "rajesh" ||
+      cleanEmail === "rajesh.kumar@walnutmedical.com";
 
     // Look up by email or id
     const user = await prisma.user.findFirst({
@@ -23,6 +27,7 @@ export async function POST(req: NextRequest) {
           { email: cleanEmail },
           { id: cleanEmail },
           { name: { equals: cleanEmail } },
+          ...(isBusinessAlias ? [{ id: "user_business" }] : []),
         ],
       },
     });

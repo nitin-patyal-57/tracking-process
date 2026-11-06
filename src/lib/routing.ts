@@ -58,7 +58,7 @@ export function determineApprovalRouting(
       },
       {
         assignedApproverId: "user_business",
-        assignedApproverName: "Pooja Sharma (Business Team)",
+        assignedApproverName: "Rajesh Kumar (Business Team)",
         assignedRoleName: "Business Team (Cost & Lead Time)",
         ruleExplanation:
           "BOM Three-Tier Review: Evaluation of component cost, vendor lead time, and supply availability.",
