@@ -26,18 +26,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Save file to public/uploads
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filename = `${timestamp}_${safeName}`;
-    const filePath = path.join(process.cwd(), "public", "uploads", filename);
+    // Process uploaded file (Datasheets / Documents)
+    const mimeType = file.type || "application/octet-stream";
+    const base64Data = buffer.toString("base64");
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
-    await writeFile(filePath, buffer);
+    // On local development, try saving to public/uploads
+    let fileUrl = dataUrl;
+    if (!process.env.VERCEL) {
+      try {
+        const timestamp = Date.now();
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const filename = `${timestamp}_${safeName}`;
+        const filePath = path.join(process.cwd(), "public", "uploads", filename);
+        await writeFile(filePath, buffer);
+        fileUrl = `/uploads/${filename}`;
+      } catch (e) {
+        // Fallback to dataUrl if filesystem is not writable
+        fileUrl = dataUrl;
+      }
+    }
 
     return NextResponse.json({
       success: true,
       filename: file.name,
-      url: `/uploads/${filename}`,
+      url: fileUrl,
     });
   } catch (error: any) {
     console.error("Upload error:", error);
