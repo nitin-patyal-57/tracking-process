@@ -3,20 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Setting up Walnut Medical System Users...");
+  console.log("Setting up Walnut Medical System Users without deleting existing data...");
 
-  // 1. Clear existing data
-  await prisma.closureFeedback.deleteMany({});
-  await prisma.inwardHandover.deleteMany({});
-  await prisma.trackingUpdate.deleteMany({});
-  await prisma.purchaseOrder.deleteMany({});
-  await prisma.alternatePart.deleteMany({});
-  await prisma.approvalLog.deleteMany({});
-  await prisma.requestItem.deleteMany({});
-  await prisma.procurementRequest.deleteMany({});
-  await prisma.user.deleteMany({});
-
-  // 2. Create Users
   const users = [
     {
       id: "user_abhishek",
@@ -28,11 +16,11 @@ async function main() {
     },
     {
       id: "user_abhishek_dir",
-      name: "Mr. Abhishek",
+      name: "Abhishek Saini",
       email: "abhishek@walnutmedical.com",
       role: "APPROVER_TIER1",
-      designation: "Director / Operations",
-      department: "Management",
+      designation: "R&D Team Lead",
+      department: "R&D",
     },
     {
       id: "user_jaydeep",
@@ -60,19 +48,11 @@ async function main() {
     },
     {
       id: "user_rajesh",
-      name: "Rajesh Kumar",
+      name: "Mr. Rajesh Kumar",
       email: "rajesh.kumar@walnutmedical.com",
-      role: "BUSINESS",
-      designation: "Procurement & Sourcing Lead",
-      department: "Purchase / Procurement",
-    },
-    {
-      id: "user_store",
-      name: "Harpreet Singh",
-      email: "store.qa@walnutmedical.com",
       role: "STORE_QA",
-      designation: "Inward Quality Inspector",
-      department: "Quality Assurance / Store",
+      designation: "Operations Head",
+      department: "Operations",
     },
     {
       id: "user_admin",
@@ -85,9 +65,20 @@ async function main() {
   ];
 
   for (const user of users) {
-    await prisma.user.create({ data: user });
+    const { id, ...profile } = user;
+    await prisma.user.upsert({
+      where: { id },
+      create: user,
+      update: { ...profile, isActive: true },
+    });
   }
-  console.log(`Created ${users.length} system users. Clean database ready for real requests.`);
+
+  await prisma.user.updateMany({
+    where: { id: "user_store" },
+    data: { isActive: false },
+  });
+
+  console.log(`Created or updated ${users.length} active system users. Existing request history was preserved.`);
 }
 
 main()

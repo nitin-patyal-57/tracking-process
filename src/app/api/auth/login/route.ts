@@ -21,15 +21,21 @@ export async function POST(req: NextRequest) {
       cleanEmail === "sukhbir@walnutmedical.com" ||
       cleanEmail === "purchase.head@walnutmedical.com" ||
       cleanEmail === "business.procurement@walnutmedical.com";
+    const isRajeshAlias =
+      cleanEmail === "rajesh" || cleanEmail === "mr. rajesh kumar";
+    const isAbhishekApproverAlias = cleanEmail === "mr. abhishek";
 
     // Look up by email or id
     const user = await prisma.user.findFirst({
       where: {
+        isActive: true,
         OR: [
           { email: cleanEmail },
           { id: cleanEmail },
           { name: { equals: cleanEmail } },
           ...(isSukhbirAlias ? [{ id: "user_business" }] : []),
+          ...(isRajeshAlias ? [{ id: "user_rajesh" }] : []),
+          ...(isAbhishekApproverAlias ? [{ id: "user_abhishek_dir" }] : []),
         ],
       },
     });

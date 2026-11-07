@@ -11,7 +11,7 @@ export interface ApprovalRoutingResult {
 /**
  * Determines the routing and required approver based on the SOP rules:
  * - Tool/Equipment: Price & Role Routing
- *   <= 2000 => Mr. Abhishek
+ *   <= 2000 => Abhishek Saini (R&D Team Lead)
  *   <= 5000 => Mr. Jaydeep Panchal
  *   > 5000  => Mr. Amol Bhardwaj (CTO)
  *   Special Case: Abhishek Sir request with technical validation => Mr. Jaydeep Panchal
@@ -31,7 +31,7 @@ export function determineApprovalRouting(
     (requesterUser && requesterUser.name.toLowerCase().includes("abhishek"));
 
   // Special Case from flowchart:
-  // "If Abhishek Sir creates a request that requires technical validation -> Routed to Jaydeep Sir for R&D Verification"
+  // Requests from Abhishek Saini requiring technical validation go to Jaydeep Panchal.
   if (isAbhishekRequester && request.technicalValidationRequired) {
     return [
       {
@@ -39,7 +39,7 @@ export function determineApprovalRouting(
         assignedApproverName: "Mr. Jaydeep Panchal",
         assignedRoleName: "R&D Head (Technical Verification)",
         ruleExplanation:
-          "Special Case Rule: Request created by Mr. Abhishek requiring technical validation is auto-routed to Mr. Jaydeep Panchal (R&D Head).",
+          "Special case: A request created by Abhishek Saini that requires technical validation is routed to Mr. Jaydeep Panchal (R&D Head).",
         stage: "SPECIAL_TECHNICAL_VERIFICATION",
       },
     ];
@@ -86,10 +86,10 @@ export function determineApprovalRouting(
   if (cost <= 2000) {
     return [
       {
-        assignedApproverId: "user_abhishek",
-        assignedApproverName: "Mr. Abhishek",
-        assignedRoleName: "Director / Operations",
-        ruleExplanation: `Price & Role Routing: Total cost (${cost.toLocaleString("en-IN")}) is <= ₹ / $ 2,000. Assigned to Mr. Abhishek.`,
+        assignedApproverId: "user_abhishek_dir",
+        assignedApproverName: "Abhishek Saini (R&D Team Lead)",
+        assignedRoleName: "R&D Team Lead",
+        ruleExplanation: `Price & Role Routing: Total cost (${cost.toLocaleString("en-IN")}) is <= ₹ / $ 2,000. Assigned to Abhishek Saini (R&D Team Lead).`,
         stage: "PRICE_ROUTING",
       },
     ];

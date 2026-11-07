@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
+      where: { isActive: true },
       orderBy: { id: "asc" },
     });
     return NextResponse.json({ users });
@@ -11,4 +12,3 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-

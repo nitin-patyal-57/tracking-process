@@ -14,7 +14,7 @@ pnpm dev
 
 ## Features Implemented
 - **Phase 1: Request Initiation** (Tool / Equipment vs BOM Parts, Excel template generator & parser, mandatory datasheet upload).
-- **Phase 2: Review & Approval Routing Engine** (Mr. Abhishek $\le ₹2k$, Mr. Jaydeep Panchal $\le ₹5k$ & BOM tech review, Mr. Amol Bhardwaj $> ₹5k$, Special Technical Verification rule).
+- **Phase 2: Review & Approval Routing Engine** (Abhishek Saini $\le ₹2k$, Mr. Jaydeep Panchal $\le ₹5k$ & BOM tech review, Mr. Amol Bhardwaj $> ₹5k$, Special Technical Verification rule).
 - **Phase 3: Order Processing Phase** (High Cost check rejection, Lead Time check, Collaborative R&D alternate parts loop, PO issuance).
 - **Phase 4: Live Part Tracking** (Supplier details, EDD $\le 7$ days automated alert, mandatory delay reason logging, role-based cost masking).
 - **Phase 5: Inward Inspection & Feedback Loop** (Store QA checklist, physical handover signoff, 3-point mandatory feedback, order closure).

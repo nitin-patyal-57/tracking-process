@@ -188,6 +188,10 @@ export default function NewRequestModal({
           setErrorMessage(`Item #${i + 1} must have an accurate Part Number and Part Name.`);
           return;
         }
+        if (!it.datasheetUrl?.trim() && !it.datasheetFileName?.trim()) {
+          setErrorMessage(`Item #${i + 1} ("${it.partNumber}"): Datasheet attachment (URL or file) is MANDATORY according to SOP.`);
+          return;
+        }
       }
     }
     setStep(3);
@@ -596,7 +600,7 @@ export default function NewRequestModal({
                   </p>
                 ) : totalCost <= 2000 ? (
                   <p>
-                    &bull; Price &le; ₹2,000 &rarr; Auto-routed to <strong>Mr. Abhishek</strong>.
+                    &bull; Price &le; ₹2,000 &rarr; Auto-routed to <strong>Abhishek Saini (R&amp;D Team Lead)</strong>.
                   </p>
                 ) : totalCost <= 5000 ? (
                   <p>
