@@ -1,8 +1,24 @@
 import { PrismaClient } from "@prisma/client";
+import fs from "fs";
+import path from "path";
 
-// Ensure DATABASE_URL is set from Vercel Postgres environment variables if available
-if (!process.env.DATABASE_URL && process.env.POSTGRES_PRISMA_URL) {
-  process.env.DATABASE_URL = process.env.POSTGRES_PRISMA_URL;
+// On Vercel Serverless with SQLite, copy bundled dev.db to writable /tmp/dev.db
+if (process.env.VERCEL && (!process.env.DATABASE_URL || process.env.DATABASE_URL.startsWith("file:"))) {
+  const tmpDbPath = path.join("/tmp", "dev.db");
+  const bundledDbPath = path.join(process.cwd(), "prisma", "dev.db");
+
+  if (!fs.existsSync(tmpDbPath)) {
+    try {
+      if (fs.existsSync(bundledDbPath)) {
+        fs.copyFileSync(bundledDbPath, tmpDbPath);
+      }
+    } catch (e) {
+      console.warn("Could not copy bundled db to /tmp:", e);
+    }
+  }
+  process.env.DATABASE_URL = `file:${tmpDbPath}`;
+} else if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "file:./dev.db";
 }
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
