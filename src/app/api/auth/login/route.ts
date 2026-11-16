@@ -23,7 +23,12 @@ export async function POST(req: NextRequest) {
       cleanEmail === "business.procurement@walnutmedical.com";
     const isRajeshAlias =
       cleanEmail === "rajesh" || cleanEmail === "mr. rajesh kumar";
-    const isAbhishekApproverAlias = cleanEmail === "mr. abhishek";
+    const isAbhishekAlias =
+      cleanEmail === "abhishek" ||
+      cleanEmail === "mr. abhishek" ||
+      cleanEmail === "abhishek.saini" ||
+      cleanEmail === "abhishek@walnutmedical.com" ||
+      cleanEmail === "abhishek.saini@walnutmedical.com";
 
     // Look up by email or id
     const user = await prisma.user.findFirst({
@@ -35,7 +40,7 @@ export async function POST(req: NextRequest) {
           { name: { equals: cleanEmail } },
           ...(isSukhbirAlias ? [{ id: "user_business" }] : []),
           ...(isRajeshAlias ? [{ id: "user_rajesh" }] : []),
-          ...(isAbhishekApproverAlias ? [{ id: "user_abhishek_dir" }] : []),
+          ...(isAbhishekAlias ? [{ id: "user_abhishek" }] : []),
         ],
       },
     });

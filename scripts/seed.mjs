@@ -10,14 +10,6 @@ async function main() {
       id: "user_abhishek",
       name: "Abhishek Saini",
       email: "abhishek.saini@walnutmedical.com",
-      role: "REQUESTER",
-      designation: "R&D Team Lead",
-      department: "R&D",
-    },
-    {
-      id: "user_abhishek_dir",
-      name: "Abhishek Saini",
-      email: "abhishek@walnutmedical.com",
       role: "APPROVER_TIER1",
       designation: "R&D Team Lead",
       department: "R&D",
@@ -74,7 +66,7 @@ async function main() {
   }
 
   await prisma.user.updateMany({
-    where: { id: "user_store" },
+    where: { id: { in: ["user_store", "user_abhishek_dir"] } },
     data: { isActive: false },
   });
 

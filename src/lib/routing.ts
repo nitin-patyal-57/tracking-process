@@ -84,11 +84,22 @@ export function determineApprovalRouting(
   }
 
   if (cost <= 2000) {
+    if (isAbhishekRequester) {
+      return [
+        {
+          assignedApproverId: "user_jaydeep",
+          assignedApproverName: "Mr. Jaydeep Panchal",
+          assignedRoleName: "R&D Head",
+          ruleExplanation: `Self-Approval Guard: Request initiated by Abhishek Saini is routed to Mr. Jaydeep Panchal (R&D Head) for independent verification.`,
+          stage: "PRICE_ROUTING",
+        },
+      ];
+    }
     return [
       {
-        assignedApproverId: "user_abhishek_dir",
-        assignedApproverName: "Abhishek Saini (R&D Team Lead)",
-        assignedRoleName: "R&D Team Lead",
+        assignedApproverId: "user_abhishek",
+        assignedApproverName: "Abhishek Saini",
+        assignedRoleName: "R&D Team Lead (Approver Tier 1)",
         ruleExplanation: `Price & Role Routing: Total cost (${cost.toLocaleString("en-IN")}) is <= ₹ / $ 2,000. Assigned to Abhishek Saini (R&D Team Lead).`,
         stage: "PRICE_ROUTING",
       },
