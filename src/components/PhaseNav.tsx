@@ -99,20 +99,18 @@ export default function PhaseNav({
               <button
                 key={p.id}
                 onClick={() => onSelectPhase(p.id as any)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all whitespace-nowrap ${
-                  isActive ? p.activeColor : p.color
-                }`}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all whitespace-nowrap ${isActive ? p.activeColor : p.color
+                  }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <div className="text-left">
                   <div className="font-semibold">{p.name}</div>
                 </div>
                 <span
-                  className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                    isActive
-                      ? "bg-white/20 text-white"
-                      : "bg-white text-slate-700 shadow-xs"
-                  }`}
+                  className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${isActive
+                    ? "bg-white/20 text-white"
+                    : "bg-white text-slate-700 shadow-xs"
+                    }`}
                 >
                   {p.count}
                 </span>
