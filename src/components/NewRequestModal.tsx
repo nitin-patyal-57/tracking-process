@@ -16,6 +16,7 @@ import {
   FileSpreadsheet,
   Layers,
   Wrench,
+  ShieldCheck,
 } from "lucide-react";
 
 interface NewRequestModalProps {
@@ -164,6 +165,19 @@ export default function NewRequestModal({
     return acc + p * q;
   }, 0);
 
+  const [autoApproveOption, setAutoApproveOption] = useState(true);
+
+  const isAbhishekRequester =
+    currentUser.id === "user_abhishek" ||
+    currentUser.name?.toLowerCase().includes("abhishek");
+
+  const canAutoApproveUnder2k =
+    Boolean(isAbhishekRequester) &&
+    requestType === "TOOL_EQUIPMENT" &&
+    totalCost > 0 &&
+    totalCost <= 2000 &&
+    !technicalValidationRequired;
+
   // Validate Step 1
   const handleNextFromStep1 = () => {
     setErrorMessage(null);
@@ -221,6 +235,7 @@ export default function NewRequestModal({
           technicalValidationRequired,
           currency: "INR",
           items,
+          autoApprove: canAutoApproveUnder2k ? autoApproveOption : false,
         }),
       });
 
@@ -647,6 +662,33 @@ export default function NewRequestModal({
                 </div>
               </div>
 
+              {/* Abhishek Saini Auto-Approval Callout */}
+              {canAutoApproveUnder2k && (
+                <div className="bg-emerald-50/90 border-2 border-emerald-400 p-3.5 rounded-2xl space-y-2 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between">
+                    <div className="font-extrabold text-xs text-emerald-950 flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span>R&amp;D Team Lead Authority (Under ₹2,000)</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
+                      Auto-Approval Option
+                    </span>
+                  </div>
+                  <p className="text-emerald-800 text-[11px] leading-relaxed">
+                    As R&amp;D Team Lead, you have the authority to auto-approve orders under ₹2,000. When auto-approved, this order transitions directly to <strong>Phase 3 (Sourcing)</strong> for review by <strong>Mr. Rajesh Kumar (Business Team Lead)</strong>.
+                  </p>
+                  <label className="flex items-center space-x-2 text-xs font-bold text-emerald-950 cursor-pointer pt-1 select-none">
+                    <input
+                      type="checkbox"
+                      checked={autoApproveOption}
+                      onChange={(e) => setAutoApproveOption(e.target.checked)}
+                      className="w-4 h-4 rounded text-emerald-600 border-emerald-400 focus:ring-emerald-500"
+                    />
+                    <span>Auto-approve this request now &amp; forward to Business Team</span>
+                  </label>
+                </div>
+              )}
+
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-600 space-y-1">
                 <div className="font-bold text-slate-800">SOP Approval Routing Rule:</div>
                 {requestType === "BOM_PARTS" ? (
@@ -660,9 +702,17 @@ export default function NewRequestModal({
                     &bull; Price left blank &rarr; Routes to <strong>Mr. Rajesh Kumar (Business &amp; Procurement Lead)</strong> to evaluate &amp; fill cost before threshold approval.
                   </p>
                 ) : totalCost <= 2000 ? (
-                  <p>
-                    &bull; Price &le; ₹2,000 &rarr; Auto-routed to <strong>Abhishek Saini (R&amp;D Team Lead)</strong>.
-                  </p>
+                  isAbhishekRequester ? (
+                    <p>
+                      &bull; Price &le; ₹2,000 requested by Abhishek Saini &rarr;{" "}
+                      <strong>Auto-Approval Option Available (Tier 1 Lead)</strong>. Forwarded directly to{" "}
+                      <strong>Mr. Rajesh Kumar (Business Team Lead)</strong> for review.
+                    </p>
+                  ) : (
+                    <p>
+                      &bull; Price &le; ₹2,000 &rarr; Auto-routed to <strong>Abhishek Saini (R&amp;D Team Lead)</strong>.
+                    </p>
+                  )
                 ) : totalCost <= 5000 ? (
                   <p>
                     &bull; Price &le; ₹5,000 &rarr; Auto-routed to <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong>.
@@ -717,7 +767,13 @@ export default function NewRequestModal({
               className="px-6 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs flex items-center gap-1.5"
             >
               <Check className="w-4 h-4" />
-              <span>{isSubmitting ? "Submitting..." : "Submit to Phase 2"}</span>
+              <span>
+                {isSubmitting
+                  ? "Submitting..."
+                  : canAutoApproveUnder2k && autoApproveOption
+                  ? "Submit & Auto-Approve to Business Team"
+                  : "Submit to Phase 2"}
+              </span>
             </button>
           )}
         </div>

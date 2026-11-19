@@ -87,11 +87,11 @@ export function determineApprovalRouting(
     if (isAbhishekRequester) {
       return [
         {
-          assignedApproverId: "user_jaydeep",
-          assignedApproverName: "Mr. Jaydeep Panchal",
-          assignedRoleName: "R&D Head",
-          ruleExplanation: `Self-Approval Guard: Request initiated by Abhishek Saini is routed to Mr. Jaydeep Panchal (R&D Head) for independent verification.`,
-          stage: "PRICE_ROUTING",
+          assignedApproverId: "user_abhishek",
+          assignedApproverName: "Abhishek Saini",
+          assignedRoleName: "R&D Team Lead (Tier 1 Auto-Approval)",
+          ruleExplanation: `Order under ₹2,000 requested by Abhishek Saini: Auto-approval option granted per SOP authority. After auto-approval, routed directly to Business Team (Mr. Rajesh Kumar) for review & order execution.`,
+          stage: "AUTO_APPROVAL",
         },
       ];
     }

@@ -84,9 +84,14 @@ export default function ApprovalsView({
       );
     }
     if (cost <= 2000) {
+      const isAbhishek =
+        req.requesterId === "user_abhishek" ||
+        req.requester?.name?.toLowerCase().includes("abhishek");
       return (
         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-          Tier 1 Approval (Abhishek Saini)
+          {isAbhishek
+            ? "Auto-Approval Option (Abhishek Saini)"
+            : "Tier 1 Approval (Abhishek Saini)"}
         </span>
       );
     }

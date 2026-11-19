@@ -119,6 +119,10 @@ export default function RequestDetailModal({
 
   const isAdmin = currentUser.role === "ADMIN" || currentUser.id === "user_admin";
 
+  const isAbhishekRequester =
+    request.requesterId === "user_abhishek" ||
+    request.requester?.name?.toLowerCase().includes("abhishek");
+
   const isToolBlankPrice = !isBom && (!request.totalEstimatedCost || request.totalEstimatedCost === 0);
 
   // Actions
@@ -137,6 +141,8 @@ export default function RequestDetailModal({
             : "THREE_TIER_BUSINESS"
           : isToolBlankPrice
           ? "PRICE_EVALUATION"
+          : isAbhishekRequester && request.totalEstimatedCost && request.totalEstimatedCost <= 2000
+          ? "AUTO_APPROVAL"
           : "PRICE_ROUTING");
 
       const costToSubmit =
@@ -398,7 +404,15 @@ export default function RequestDetailModal({
             </div>
             <div className="text-[11px] text-slate-600">
               {request.totalEstimatedCost <= 2000 ? (
-                <span>&bull; Cost &le; ₹2,000 &rarr; Assigned to <strong>Abhishek Saini (R&amp;D Team Lead)</strong></span>
+                isAbhishekRequester ? (
+                  <span>
+                    &bull; Cost &le; ₹2,000 requested by Abhishek Saini &rarr;{" "}
+                    <strong>Tier 1 Auto-Approval Option Available</strong>. Moves directly to{" "}
+                    <strong>Business Team (Mr. Rajesh Kumar)</strong> for review.
+                  </span>
+                ) : (
+                  <span>&bull; Cost &le; ₹2,000 &rarr; Assigned to <strong>Abhishek Saini (R&amp;D Team Lead)</strong></span>
+                )
               ) : request.totalEstimatedCost <= 5000 ? (
                 <span>&bull; Cost &le; ₹5,000 &rarr; Assigned to <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong></span>
               ) : (
@@ -478,17 +492,31 @@ export default function RequestDetailModal({
             </button>
           )}
 
-          {/* Tool Regular Threshold Approval Button */}
+          {/* Tool Regular Threshold Approval or Abhishek Auto-Approval Button */}
           {!isBom && !isToolBlankPrice && (
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => handleApprove("PRICE_ROUTING")}
-              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
-            >
-              <Check className="w-3.5 h-3.5" />
-              <span>Authorize &amp; Send to Sourcing (Phase 3)</span>
-            </button>
+            isAbhishekRequester && request.totalEstimatedCost <= 2000 ? (
+              (isAbhishek || isAdmin) && (
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleApprove("AUTO_APPROVAL")}
+                  className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Auto-Approve &amp; Send to Business Team</span>
+                </button>
+              )
+            ) : (
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => handleApprove("PRICE_ROUTING")}
+                className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Authorize &amp; Send to Sourcing (Phase 3)</span>
+              </button>
+            )
           )}
         </div>
       </div>
@@ -828,18 +856,27 @@ export default function RequestDetailModal({
               {/* Phase 3 PO Issuance */}
               {request.currentPhase === "PHASE_3" && (
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 space-y-3">
-                  <div className="font-bold text-emerald-900 text-sm">
-                    Phase 3: Order Processing (Business Team)
+                  <div className="font-bold text-emerald-900 text-sm flex items-center justify-between">
+                    <span>Phase 3: Business Team Review &amp; Order Execution</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800">
+                      Mr. Rajesh Kumar (Business Lead)
+                    </span>
                   </div>
                   <p className="text-slate-600 text-xs">
-                    Issue Purchase Order and transition request to live tracking.
+                    Business Team reviews component availability, vendor quotations, and issues Purchase Order to transition to live delivery tracking.
                   </p>
-                  <button
-                    onClick={() => setShowPoModal(true)}
-                    className="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs"
-                  >
-                    + Issue PO &amp; Place Order
-                  </button>
+                  {(isRajesh || isAdmin) ? (
+                    <button
+                      onClick={() => setShowPoModal(true)}
+                      className="px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs"
+                    >
+                      + Issue PO &amp; Place Order
+                    </button>
+                  ) : (
+                    <div className="text-xs font-semibold text-emerald-800 bg-white/80 p-2.5 rounded-xl border border-emerald-100">
+                      Under review by Mr. Rajesh Kumar (Business &amp; Procurement Lead) for PO issuance.
+                    </div>
+                  )}
                 </div>
               )}
 

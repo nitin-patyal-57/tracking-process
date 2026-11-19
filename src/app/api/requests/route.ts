@@ -115,6 +115,7 @@ export async function POST(req: NextRequest) {
       items,
       technicalValidationRequired,
       currency = "INR",
+      autoApprove,
     } = body;
 
     if (!title || !requesterId || !items || !Array.isArray(items) || items.length === 0) {
@@ -164,6 +165,24 @@ export async function POST(req: NextRequest) {
       totalEstimatedCost = null; // Optional: Business Team will evaluate cost
     }
 
+    // Check if Abhishek Saini auto-approves under ₹2,000
+    const requester = await prisma.user.findUnique({ where: { id: requesterId } });
+    const isAbhishek =
+      requesterId === "user_abhishek" ||
+      (requester && requester.name.toLowerCase().includes("abhishek"));
+
+    const shouldAutoApproveUnder2k =
+      Boolean(autoApprove) &&
+      isAbhishek &&
+      requestType === "TOOL_EQUIPMENT" &&
+      totalEstimatedCost !== null &&
+      totalEstimatedCost > 0 &&
+      totalEstimatedCost <= 2000 &&
+      !technicalValidationRequired;
+
+    const initialPhase = shouldAutoApproveUnder2k ? "PHASE_3" : "PHASE_2";
+    const initialStatus = shouldAutoApproveUnder2k ? "SOURCING" : "PENDING_APPROVAL";
+
     // Generate Request Number
     const count = await prisma.procurementRequest.count();
     const prefix = requestType === "BOM_PARTS" ? "WMPL-BOM-2026" : "WMPL-REQ-2026";
@@ -176,8 +195,8 @@ export async function POST(req: NextRequest) {
         title,
         justification,
         requesterId,
-        status: "PENDING_APPROVAL",
-        currentPhase: "PHASE_2",
+        status: initialStatus,
+        currentPhase: initialPhase,
         totalEstimatedCost,
         currency,
         technicalValidationRequired: Boolean(technicalValidationRequired),
@@ -193,14 +212,33 @@ export async function POST(req: NextRequest) {
             finalUnitPrice: parseFloat(it.estimatedUnitPrice) || null,
           })),
         },
+        ...(shouldAutoApproveUnder2k
+          ? {
+              approvals: {
+                create: {
+                  approverId: requesterId,
+                  roleName: "R&D Team Lead (Tier 1 Auto-Approval)",
+                  stage: "AUTO_APPROVAL",
+                  decision: "APPROVED",
+                  comments:
+                    "Auto-approved under ₹2,000 authority by Abhishek Saini. Forwarded to Business Team (Mr. Rajesh Kumar) for review & order execution.",
+                },
+              },
+            }
+          : {}),
       },
       include: {
         requester: true,
         items: true,
+        approvals: true,
       },
     });
 
-    return NextResponse.json({ success: true, request: newRequest });
+    return NextResponse.json({
+      success: true,
+      request: newRequest,
+      autoApproved: shouldAutoApproveUnder2k,
+    });
   } catch (error: any) {
     console.error("POST /api/requests error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
