@@ -170,6 +170,81 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
             )}
           </button>
         </form>
+
+        {/* 1-Click Fast Sign-In for 4 Core Leaders */}
+        <div className="pt-4 border-t border-slate-100 space-y-2.5">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+            <span>Leadership Quick Sign-In</span>
+            <span className="text-[10px] text-slate-400 font-normal">Walnut@2026</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("abhishek.saini@walnutmedical.com");
+                setPassword("Walnut@2026");
+              }}
+              className="p-2.5 bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 hover:border-blue-300 rounded-xl text-left transition-all group"
+            >
+              <div className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
+                Abhishek Saini
+              </div>
+              <div className="text-[10px] text-slate-500">R&amp;D Team Lead (Tier 1)</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("jaydeep.panchal@walnutmedical.com");
+                setPassword("Walnut@2026");
+              }}
+              className="p-2.5 bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 hover:border-blue-300 rounded-xl text-left transition-all group"
+            >
+              <div className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
+                Mr. Jaydeep Panchal
+              </div>
+              <div className="text-[10px] text-slate-500">R&amp;D Head (Tier 2 &amp; Tech)</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("amol.bhardwaj@walnutmedical.com");
+                setPassword("Walnut@2026");
+              }}
+              className="p-2.5 bg-purple-50/70 hover:bg-purple-100/70 border border-purple-200 hover:border-purple-300 rounded-xl text-left transition-all group col-span-1 sm:col-span-2"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-purple-950">
+                  Mr. Amol Bhardwaj
+                </span>
+                <span className="px-1.5 py-0.5 rounded-md bg-purple-200 text-purple-800 text-[9px] font-extrabold uppercase">
+                  CTO &amp; Admin (Merged)
+                </span>
+              </div>
+              <div className="text-[10px] text-purple-700">
+                Chief Technology Officer &amp; System Administrator (Full Admin Access)
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("rajesh.kumar@walnutmedical.com");
+                setPassword("Walnut@2026");
+              }}
+              className="p-2.5 bg-slate-50 hover:bg-blue-50/70 border border-slate-200/80 hover:border-blue-300 rounded-xl text-left transition-all group col-span-1 sm:col-span-2"
+            >
+              <div className="text-xs font-bold text-slate-900 group-hover:text-blue-700">
+                Mr. Rajesh Kumar
+              </div>
+              <div className="text-[10px] text-slate-500">
+                Business, Procurement &amp; Store Lead (PO &amp; QA)
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

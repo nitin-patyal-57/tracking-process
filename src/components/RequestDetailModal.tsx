@@ -425,7 +425,7 @@ export default function RequestDetailModal({
               ) : request.totalEstimatedCost != null && request.totalEstimatedCost <= 5000 ? (
                 <span>&bull; Cost &le; ₹5,000 &rarr; Assigned to <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong></span>
               ) : request.totalEstimatedCost != null ? (
-                <span>&bull; Cost &gt; ₹5,000 &rarr; Assigned to <strong>Mr. Amol Bhardwaj (CTO)</strong></span>
+                <span>&bull; Cost &gt; ₹5,000 &rarr; Assigned to <strong>Mr. Amol Bhardwaj (CTO &amp; System Administrator)</strong></span>
               ) : (
                 <span>&bull; Price Evaluation required by <strong>Mr. Rajesh Kumar (Business Team)</strong></span>
               )}
