@@ -23,15 +23,12 @@ export async function POST(req: NextRequest) {
       rawClean === "abhishek saini" ||
       noSpaces.includes("abhishek");
 
-    const isSukhbir =
-      rawClean === "sukhbir" ||
-      rawClean === "mr. sukhbir" ||
-      noSpaces.includes("sukhbir");
-
     const isRajesh =
       rawClean === "rajesh" ||
       rawClean === "mr. rajesh" ||
       rawClean === "mr. rajesh kumar" ||
+      rawClean === "business" ||
+      rawClean === "store" ||
       noSpaces.includes("rajesh");
 
     const isJaydeep =
@@ -65,7 +62,6 @@ export async function POST(req: NextRequest) {
           ...(isJaydeep ? [{ id: "user_jaydeep" }, { email: "jaydeep.panchal@walnutmedical.com" }] : []),
           ...(isAmol ? [{ id: "user_amol" }, { email: "amol.bhardwaj@walnutmedical.com" }] : []),
           ...(isRajesh ? [{ id: "user_business" }, { email: "rajesh.kumar@walnutmedical.com" }] : []),
-          ...(isSukhbir ? [{ id: "user_store" }, { email: "sukhbir@walnutmedical.com" }] : []),
           ...(isAdmin ? [{ id: "user_admin" }, { email: "admin@walnutmedical.com" }] : []),
         ],
       },

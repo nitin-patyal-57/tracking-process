@@ -48,7 +48,7 @@ export default function InspectionView({
             Physical Handover &amp; Acceptance Sign-off
           </div>
           <p className="text-purple-800">
-            Store/QA checks packaging integrity, counts physical quantities against PO, and logs digital sign-off with requester.
+            Business &amp; Store Lead (Mr. Rajesh Kumar) checks packaging integrity, counts physical quantities against PO, and logs digital sign-off with requester.
           </p>
         </div>
 
