@@ -14,33 +14,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cleanEmail = String(email).trim().toLowerCase();
-    const isSukhbirAlias =
-      cleanEmail === "sukhbir" ||
-      cleanEmail === "mr. sukhbir" ||
-      cleanEmail === "sukhbir@walnutmedical.com" ||
-      cleanEmail === "purchase.head@walnutmedical.com" ||
-      cleanEmail === "business.procurement@walnutmedical.com";
-    const isRajeshAlias =
-      cleanEmail === "rajesh" || cleanEmail === "mr. rajesh kumar";
-    const isAbhishekAlias =
-      cleanEmail === "abhishek" ||
-      cleanEmail === "mr. abhishek" ||
-      cleanEmail === "abhishek.saini" ||
-      cleanEmail === "abhishek@walnutmedical.com" ||
-      cleanEmail === "abhishek.saini@walnutmedical.com";
+    const rawClean = String(email).trim().toLowerCase();
+    const noSpaces = rawClean.replace(/\s+/g, "");
 
-    // Look up by email or id
+    const isAbhishek =
+      rawClean === "abhishek" ||
+      rawClean === "mr. abhishek" ||
+      rawClean === "abhishek saini" ||
+      noSpaces.includes("abhishek");
+
+    const isSukhbir =
+      rawClean === "sukhbir" ||
+      rawClean === "mr. sukhbir" ||
+      noSpaces.includes("sukhbir");
+
+    const isRajesh =
+      rawClean === "rajesh" ||
+      rawClean === "mr. rajesh" ||
+      rawClean === "mr. rajesh kumar" ||
+      noSpaces.includes("rajesh");
+
+    const isJaydeep =
+      rawClean === "jaydeep" ||
+      rawClean === "mr. jaydeep" ||
+      rawClean === "mr. jaydeep panchal" ||
+      noSpaces.includes("jaydeep");
+
+    const isAmol =
+      rawClean === "amol" ||
+      rawClean === "mr. amol" ||
+      rawClean === "mr. amol bhardwaj" ||
+      noSpaces.includes("amol");
+
+    const isAdmin =
+      rawClean === "admin" ||
+      rawClean === "walnut admin" ||
+      noSpaces.includes("admin");
+
+    // Look up by email, ID, alias, or normalized string
     const user = await prisma.user.findFirst({
       where: {
         isActive: true,
         OR: [
-          { email: cleanEmail },
-          { id: cleanEmail },
-          { name: { equals: cleanEmail } },
-          ...(isSukhbirAlias ? [{ id: "user_business" }] : []),
-          ...(isRajeshAlias ? [{ id: "user_rajesh" }] : []),
-          ...(isAbhishekAlias ? [{ id: "user_abhishek" }] : []),
+          { email: rawClean },
+          { email: noSpaces },
+          { id: rawClean },
+          { id: noSpaces },
+          { name: { equals: rawClean } },
+          ...(isAbhishek ? [{ id: "user_abhishek" }] : []),
+          ...(isJaydeep ? [{ id: "user_jaydeep" }] : []),
+          ...(isAmol ? [{ id: "user_amol" }] : []),
+          ...(isSukhbir ? [{ id: "user_business" }] : []),
+          ...(isRajesh ? [{ id: "user_rajesh" }] : []),
+          ...(isAdmin ? [{ id: "user_admin" }] : []),
         ],
       },
     });

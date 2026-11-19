@@ -30,10 +30,13 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setLoading(true);
 
     try {
+      // Clean email: if it contains '@', remove all internal accidental whitespace
+      const cleanInput = email.includes("@") ? email.replace(/\s+/g, "") : email.trim();
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password, rememberMe }),
+        body: JSON.stringify({ email: cleanInput, password, rememberMe }),
       });
 
       const data = await res.json();
