@@ -188,8 +188,12 @@ export default function NewRequestModal({
           setErrorMessage(`Item #${i + 1} must have an accurate Part Number and Part Name.`);
           return;
         }
-        if (!it.datasheetUrl?.trim() && !it.datasheetFileName?.trim()) {
-          setErrorMessage(`Item #${i + 1} ("${it.partNumber}"): Datasheet attachment (URL or file) is MANDATORY according to SOP.`);
+        const hasDatasheet = Boolean(it.datasheetUrl?.trim() || it.datasheetFileName?.trim());
+        const hasSource = Boolean(it.optionalSource?.trim());
+        if (!hasDatasheet && !hasSource) {
+          setErrorMessage(
+            `Item #${i + 1} ("${it.partNumber}"): Datasheet attachment is required. If datasheet is not available, then Part Source URL is MANDATORY.`
+          );
           return;
         }
       }
@@ -466,6 +470,30 @@ export default function NewRequestModal({
           {/* ================= STEP 2: ITEMS / BOM ================= */}
           {step === 2 && (
             <div className="space-y-4">
+              {/* Type-Specific SOP Guidance Banner */}
+              {requestType === "BOM_PARTS" ? (
+                <div className="bg-purple-50/80 border border-purple-200 rounded-xl p-3 text-[11px] text-purple-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-purple-700" />
+                    <span>BOM Parts Specification (DOC. NO. WMPL-QAS-025-01A)</span>
+                  </div>
+                  <p className="text-purple-800">
+                    Accurate Part Number (MPN) &amp; Part Name are mandatory. Datasheet attachment is required.
+                    <span className="font-bold underline ml-1">If datasheet is not available, then Part Source URL is MANDATORY.</span>
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-900 space-y-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <Wrench className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Tool / Equipment / Machine / Experiment (Fixed Template)</span>
+                  </div>
+                  <p className="text-amber-800">
+                    Single or Batch item request. Price Field is <strong className="underline">Optional</strong>. If left blank, Mr. Rajesh Kumar (Business &amp; Procurement Lead) will evaluate and fill the cost.
+                  </p>
+                </div>
+              )}
+
               <div className="flex items-center justify-between">
                 <div className="text-xs font-bold text-slate-800">
                   Part Items ({items.length})
@@ -477,7 +505,7 @@ export default function NewRequestModal({
                     className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200"
                   >
                     <FileSpreadsheet className="w-3 h-3" />
-                    Template
+                    Download Template
                   </a>
                   <button
                     type="button"
@@ -491,73 +519,97 @@ export default function NewRequestModal({
               </div>
 
               {/* Items Table */}
-              <div className="space-y-2.5 max-h-80 overflow-y-auto">
-                {items.map((it, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-bold text-slate-600">
-                        Item #{idx + 1}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(idx)}
-                        disabled={items.length <= 1}
-                        className="text-slate-400 hover:text-rose-600 disabled:opacity-20"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+              <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                {items.map((it, idx) => {
+                  const hasDatasheet = Boolean(it.datasheetFileName || it.datasheetUrl);
+                  return (
+                    <div
+                      key={idx}
+                      className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold text-slate-600">
+                          Item #{idx + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(idx)}
+                          disabled={items.length <= 1}
+                          className="text-slate-400 hover:text-rose-600 disabled:opacity-20"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        placeholder="Part Number (MPN) *"
-                        value={it.partNumber}
-                        onChange={(e) => handleItemChange(idx, "partNumber", e.target.value)}
-                        className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg font-mono"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Part Name *"
-                        value={it.partName}
-                        onChange={(e) => handleItemChange(idx, "partName", e.target.value)}
-                        className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="Qty"
-                        value={it.quantity}
-                        onChange={(e) =>
-                          handleItemChange(idx, "quantity", parseInt(e.target.value, 10) || 1)
-                        }
-                        className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-center"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Unit Price (₹)"
-                        value={it.estimatedUnitPrice}
-                        onChange={(e) => handleItemChange(idx, "estimatedUnitPrice", e.target.value)}
-                        className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-right font-mono"
-                      />
-                      <label className="px-2 py-1 text-[11px] bg-white border border-slate-200 rounded-lg flex items-center justify-center cursor-pointer text-blue-600 font-semibold truncate">
-                        {it.datasheetFileName || (uploadingIndex === idx ? "Uploading..." : "PDF Spec")}
+                      <div className="grid grid-cols-2 gap-2">
                         <input
-                          type="file"
-                          accept=".pdf,.png,.jpg"
-                          onChange={(e) => handleDatasheetUpload(idx, e.target.files?.[0] || null)}
-                          className="hidden"
+                          type="text"
+                          placeholder="Part Number (MPN) *"
+                          value={it.partNumber}
+                          onChange={(e) => handleItemChange(idx, "partNumber", e.target.value)}
+                          className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg font-mono"
                         />
-                      </label>
+                        <input
+                          type="text"
+                          placeholder="Part Name *"
+                          value={it.partName}
+                          onChange={(e) => handleItemChange(idx, "partName", e.target.value)}
+                          className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          placeholder="Qty"
+                          value={it.quantity}
+                          onChange={(e) =>
+                            handleItemChange(idx, "quantity", parseInt(e.target.value, 10) || 1)
+                          }
+                          className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-center font-medium"
+                        />
+                        <input
+                          type="number"
+                          placeholder={requestType === "TOOL_EQUIPMENT" ? "Price (₹) [Optional]" : "Unit Price (₹)"}
+                          value={it.estimatedUnitPrice}
+                          onChange={(e) => handleItemChange(idx, "estimatedUnitPrice", e.target.value)}
+                          className="px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-right font-mono"
+                        />
+                        <label className={`px-2 py-1 text-[11px] rounded-lg flex items-center justify-center cursor-pointer font-semibold truncate border ${hasDatasheet ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-white text-blue-600 border-slate-200"}`}>
+                          {it.datasheetFileName || (uploadingIndex === idx ? "Uploading..." : "Attach Datasheet")}
+                          <input
+                            type="file"
+                            accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                            onChange={(e) => handleDatasheetUpload(idx, e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      {/* Part Source URL - Mandatory if no datasheet for BOM */}
+                      <div>
+                        <input
+                          type="text"
+                          placeholder={
+                            requestType === "BOM_PARTS"
+                              ? (hasDatasheet
+                                  ? "Part Source URL (Optional)"
+                                  : "Part Source URL (MANDATORY because no datasheet attached) *")
+                              : "Suggested Vendor / Product URL (Optional)"
+                          }
+                          value={it.optionalSource || ""}
+                          onChange={(e) => handleItemChange(idx, "optionalSource", e.target.value)}
+                          className={`w-full px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${
+                            requestType === "BOM_PARTS" && !hasDatasheet && !it.optionalSource?.trim()
+                              ? "bg-amber-50/60 border-amber-300 focus:border-amber-500 text-slate-800 placeholder:text-amber-700"
+                              : "bg-white border-slate-200 focus:border-blue-500 text-slate-800"
+                          }`}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -586,7 +638,11 @@ export default function NewRequestModal({
                 <div className="pt-2 border-t border-blue-200 flex justify-between items-center text-sm">
                   <span className="font-semibold text-slate-600">Total Estimated Cost:</span>
                   <span className="font-bold text-slate-900 text-base font-mono">
-                    ₹{totalCost.toLocaleString("en-IN")}
+                    {totalCost > 0
+                      ? `₹${totalCost.toLocaleString("en-IN")}`
+                      : requestType === "TOOL_EQUIPMENT"
+                      ? "Optional / Blank (Will be evaluated by Mr. Rajesh Kumar)"
+                      : "₹0"}
                   </span>
                 </div>
               </div>
@@ -596,7 +652,12 @@ export default function NewRequestModal({
                 {requestType === "BOM_PARTS" ? (
                   <p>
                     &bull; Routes to <strong>Three-Tier Review</strong>: Technical verification by{" "}
-                    <strong>Mr. Jaydeep Panchal</strong> &amp; Cost review by <strong>Business Team</strong>.
+                    <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong> &amp; Cost/Lead Time review by{" "}
+                    <strong>Mr. Rajesh Kumar (Business Team Lead)</strong>.
+                  </p>
+                ) : totalCost === 0 ? (
+                  <p>
+                    &bull; Price left blank &rarr; Routes to <strong>Mr. Rajesh Kumar (Business &amp; Procurement Lead)</strong> to evaluate &amp; fill cost before threshold approval.
                   </p>
                 ) : totalCost <= 2000 ? (
                   <p>

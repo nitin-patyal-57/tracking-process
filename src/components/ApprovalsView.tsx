@@ -47,23 +47,59 @@ export default function ApprovalsView({
 
   const getStageBadge = (req: any) => {
     if (req.requestType === "BOM_PARTS") {
+      const approvedLogs = req.approvals?.filter((a: any) => a.decision === "APPROVED") || [];
+      const hasTech = approvedLogs.some(
+        (a: any) => a.stage === "THREE_TIER_TECHNICAL" || a.approverId === "user_jaydeep"
+      );
+      const hasBiz = approvedLogs.some(
+        (a: any) => a.stage === "THREE_TIER_BUSINESS" || a.approverId === "user_business"
+      );
+
+      if (hasTech && !hasBiz) {
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700">
+            Pending Cost Review (Rajesh)
+          </span>
+        );
+      }
+      if (!hasTech && hasBiz) {
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-100 text-purple-700">
+            Pending Technical Review (Jaydeep)
+          </span>
+        );
+      }
       return (
         <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-100 text-purple-700">
-          Technical Review
+          Three-Tier Review (Jaydeep &amp; Rajesh)
         </span>
       );
     }
-    const cost = req.totalEstimatedCost || 0;
+    const cost = req.totalEstimatedCost;
+    if (cost === null || cost === undefined || cost === 0) {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">
+          Cost Evaluation (Mr. Rajesh Kumar)
+        </span>
+      );
+    }
     if (cost <= 2000) {
       return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700">
-          Price Approval
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+          Tier 1 Approval (Abhishek Saini)
+        </span>
+      );
+    }
+    if (cost <= 5000) {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800">
+          Tier 2 Approval (Mr. Jaydeep Panchal)
         </span>
       );
     }
     return (
-      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700">
-        Role Approval
+      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">
+        Tier 3 Approval (Mr. Amol Bhardwaj - CTO)
       </span>
     );
   };

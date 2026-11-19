@@ -1,4 +1,4 @@
-import { ProcurementRequest, User } from "@prisma/client";
+import type { ProcurementRequest, User } from "@prisma/client";
 
 export interface ApprovalRoutingResult {
   assignedApproverId: string;
@@ -58,10 +58,10 @@ export function determineApprovalRouting(
       },
       {
         assignedApproverId: "user_business",
-        assignedApproverName: "Mr. Sukhbir (Purchase Department Head)",
-        assignedRoleName: "Purchase Department Head (Cost & Lead Time)",
+        assignedApproverName: "Mr. Rajesh Kumar",
+        assignedRoleName: "Business & Procurement Lead (Cost & Lead Time)",
         ruleExplanation:
-          "BOM Three-Tier Review: Evaluation of component cost, vendor lead time, and supply availability by Purchase Department Head.",
+          "BOM Three-Tier Review: Evaluation of component cost, vendor lead time, and supply availability by Business & Procurement Lead (Mr. Rajesh Kumar).",
         stage: "THREE_TIER_BUSINESS",
       },
     ];
@@ -74,10 +74,10 @@ export function determineApprovalRouting(
     return [
       {
         assignedApproverId: "user_business",
-        assignedApproverName: "Mr. Sukhbir (Purchase Department Head)",
-        assignedRoleName: "Purchase Department Head (Cost Evaluation)",
+        assignedApproverName: "Mr. Rajesh Kumar",
+        assignedRoleName: "Business & Procurement Lead (Cost Evaluation)",
         ruleExplanation:
-          "Price was left optional/blank by requester. Routed to Mr. Sukhbir (Purchase Department Head) to evaluate & fill cost before threshold approval.",
+          "Price was left optional/blank by requester. Routed to Mr. Rajesh Kumar (Business & Procurement Lead) to evaluate & fill cost before threshold approval.",
         stage: "PRICE_EVALUATION",
       },
     ];

@@ -98,20 +98,33 @@ export async function POST(
     });
 
     // Check if ready for Phase 3:
-    // For BOM_PARTS, check if both Technical (Jaydeep) and Business have approved.
     const allApprovals = await prisma.approvalLog.findMany({
       where: { requestId: id, decision: "APPROVED" },
     });
 
     let canMoveToPhase3 = false;
-    if (request.requestType === "BOM_PARTS") {
-      const hasTech = allApprovals.some((a) => a.stage === "THREE_TIER_TECHNICAL" || a.approverId === "user_jaydeep");
-      const hasBiz = allApprovals.some((a) => a.stage === "THREE_TIER_BUSINESS" || a.approverId === "user_business");
+    const isAdmin = approver.role === "ADMIN" || approver.id === "user_admin";
+
+    if (isAdmin) {
+      canMoveToPhase3 = true;
+    } else if (request.requestType === "BOM_PARTS") {
+      const hasTech = allApprovals.some(
+        (a) =>
+          a.stage === "THREE_TIER_TECHNICAL" ||
+          a.approverId === "user_jaydeep" ||
+          a.approverId === "user_admin"
+      );
+      const hasBiz = allApprovals.some(
+        (a) =>
+          a.stage === "THREE_TIER_BUSINESS" ||
+          a.approverId === "user_business" ||
+          a.approverId === "user_admin"
+      );
       if (hasTech && hasBiz) {
         canMoveToPhase3 = true;
       }
     } else {
-      // For Tool/Equipment, single threshold approval is sufficient
+      // For Tool/Equipment, threshold approval or Business Lead evaluation is sufficient to proceed
       canMoveToPhase3 = true;
     }
 
@@ -128,10 +141,37 @@ export async function POST(
       },
     });
 
+    let message = "Request approval recorded successfully.";
+    if (canMoveToPhase3) {
+      message = "Request approved and advanced to Phase 3 (Sourcing & PO Processing)!";
+    } else if (request.requestType === "BOM_PARTS") {
+      const hasTech = allApprovals.some(
+        (a) =>
+          a.stage === "THREE_TIER_TECHNICAL" ||
+          a.approverId === "user_jaydeep" ||
+          a.approverId === "user_admin"
+      );
+      const hasBiz = allApprovals.some(
+        (a) =>
+          a.stage === "THREE_TIER_BUSINESS" ||
+          a.approverId === "user_business" ||
+          a.approverId === "user_admin"
+      );
+
+      if (hasTech && !hasBiz) {
+        message =
+          "Technical Review by Mr. Jaydeep Panchal recorded! Awaiting Cost & Lead Time sign-off from Mr. Rajesh Kumar (Business Lead).";
+      } else if (!hasTech && hasBiz) {
+        message =
+          "Cost & Lead Time Review by Mr. Rajesh Kumar recorded! Awaiting Technical sign-off from Mr. Jaydeep Panchal (R&D Head).";
+      }
+    }
+
     return NextResponse.json({
       success: true,
       request: updated,
       canMoveToPhase3,
+      message,
     });
   } catch (error: any) {
     console.error("Approval error:", error);

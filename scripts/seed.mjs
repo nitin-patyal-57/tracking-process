@@ -5,6 +5,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Setting up Walnut Medical System Users without deleting existing data...");
 
+  // Remove old conflicting IDs if email is being transferred
+  await prisma.user.deleteMany({
+    where: { id: { in: ["user_rajesh", "user_abhishek_dir"] } },
+  });
+
   const users = [
     {
       id: "user_abhishek",
@@ -32,19 +37,19 @@ async function main() {
     },
     {
       id: "user_business",
-      name: "Mr. Sukhbir",
-      email: "sukhbir@walnutmedical.com",
-      role: "BUSINESS",
-      designation: "Purchase Department Head",
-      department: "Purchase Department",
-    },
-    {
-      id: "user_rajesh",
       name: "Mr. Rajesh Kumar",
       email: "rajesh.kumar@walnutmedical.com",
+      role: "BUSINESS",
+      designation: "Business & Procurement Lead",
+      department: "Purchase & Procurement",
+    },
+    {
+      id: "user_store",
+      name: "Mr. Sukhbir",
+      email: "sukhbir@walnutmedical.com",
       role: "STORE_QA",
-      designation: "Operations Head",
-      department: "Operations",
+      designation: "Store & QA Lead",
+      department: "Store & Quality Assurance",
     },
     {
       id: "user_admin",
@@ -66,7 +71,7 @@ async function main() {
   }
 
   await prisma.user.updateMany({
-    where: { id: { in: ["user_store", "user_abhishek_dir"] } },
+    where: { id: { in: ["user_rajesh", "user_abhishek_dir"] } },
     data: { isActive: false },
   });
 

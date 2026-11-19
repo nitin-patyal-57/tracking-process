@@ -128,16 +128,18 @@ export async function POST(req: NextRequest) {
     if (requestType === "BOM_PARTS") {
       for (let i = 0; i < items.length; i++) {
         const it = items[i];
-        if (!it.partNumber || !it.partName) {
+        if (!it.partNumber?.trim() || !it.partName?.trim()) {
           return NextResponse.json(
             { error: `Item #${i + 1} must include an accurate Part Number and Part Name.` },
             { status: 400 }
           );
         }
-        if (!it.datasheetUrl && !it.datasheetFileName) {
+        const hasDatasheet = Boolean(it.datasheetUrl?.trim() || it.datasheetFileName?.trim());
+        const hasSource = Boolean(it.optionalSource?.trim());
+        if (!hasDatasheet && !hasSource) {
           return NextResponse.json(
             {
-              error: `Datasheet attachment is MANDATORY for BOM part "${it.partNumber}". Please upload a datasheet.`,
+              error: `Item #${i + 1} ("${it.partNumber}"): Datasheet attachment is required. If datasheet is not available, then Part Source URL is MANDATORY.`,
             },
             { status: 400 }
           );

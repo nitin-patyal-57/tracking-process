@@ -20,6 +20,8 @@ import {
   Check,
   Star,
   ExternalLink,
+  Cpu,
+  Wrench,
 } from "lucide-react";
 
 interface RequestDetailModalProps {
@@ -43,6 +45,7 @@ export default function RequestDetailModal({
   const [approvalComment, setApprovalComment] = useState("");
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [evaluatedPrice, setEvaluatedPrice] = useState("");
 
   // Phase 3 State
   const [showPoModal, setShowPoModal] = useState(false);
@@ -77,20 +80,95 @@ export default function RequestDetailModal({
   const isPhase4Done = request.currentPhase === "PHASE_5" || request.status === "CLOSED";
   const isPhase5Done = request.status === "CLOSED";
 
+  const isBom = request.requestType === "BOM_PARTS";
+  const approvedLogs = request.approvals?.filter((a: any) => a.decision === "APPROVED") || [];
+  const hasTechApproval = approvedLogs.some(
+    (a: any) =>
+      a.stage === "THREE_TIER_TECHNICAL" ||
+      a.approverId === "user_jaydeep" ||
+      a.approver?.name?.toLowerCase().includes("jaydeep") ||
+      a.approverId === "user_admin"
+  );
+  const hasBusinessApproval = approvedLogs.some(
+    (a: any) =>
+      a.stage === "THREE_TIER_BUSINESS" ||
+      a.approverId === "user_business" ||
+      a.approver?.name?.toLowerCase().includes("rajesh") ||
+      a.approverId === "user_admin"
+  );
+
+  const isJaydeep =
+    currentUser.id === "user_jaydeep" ||
+    currentUser.role === "APPROVER_TIER2" ||
+    currentUser.name?.toLowerCase().includes("jaydeep");
+
+  const isRajesh =
+    currentUser.id === "user_business" ||
+    currentUser.role === "BUSINESS" ||
+    currentUser.name?.toLowerCase().includes("rajesh");
+
+  const isAbhishek =
+    currentUser.id === "user_abhishek" ||
+    currentUser.role === "APPROVER_TIER1" ||
+    currentUser.name?.toLowerCase().includes("abhishek");
+
+  const isAmol =
+    currentUser.id === "user_amol" ||
+    currentUser.role === "APPROVER_TIER3" ||
+    currentUser.name?.toLowerCase().includes("amol");
+
+  const isAdmin = currentUser.role === "ADMIN" || currentUser.id === "user_admin";
+
+  const isToolBlankPrice = !isBom && (!request.totalEstimatedCost || request.totalEstimatedCost === 0);
+
   // Actions
-  const handleApprove = async () => {
+  const handleApprove = async (selectedStage?: string, customCost?: number) => {
     setLoading(true);
     try {
-      await fetch(`/api/requests/${request.id}/approve`, {
+      const stageToUse =
+        selectedStage ||
+        (isBom
+          ? isJaydeep
+            ? "THREE_TIER_TECHNICAL"
+            : isRajesh
+            ? "THREE_TIER_BUSINESS"
+            : !hasTechApproval
+            ? "THREE_TIER_TECHNICAL"
+            : "THREE_TIER_BUSINESS"
+          : isToolBlankPrice
+          ? "PRICE_EVALUATION"
+          : "PRICE_ROUTING");
+
+      const costToSubmit =
+        customCost !== undefined
+          ? customCost
+          : evaluatedPrice
+          ? parseFloat(evaluatedPrice)
+          : undefined;
+
+      const res = await fetch(`/api/requests/${request.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           approverId: currentUser.id,
           decision: "APPROVED",
-          comments: approvalComment || "Approved as per SOP authority.",
+          comments: approvalComment || `Approved by ${currentUser.name} as per SOP authority.`,
+          stage: stageToUse,
+          estimatedCostIfBlank: costToSubmit,
         }),
       });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Approval Error: " + (data.error || "Failed to approve request."));
+        return;
+      }
+
+      alert(data.message || "Request approved successfully!");
       onRefresh();
+      onClose();
+    } catch (err: any) {
+      alert("Network error: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -103,7 +181,7 @@ export default function RequestDetailModal({
     }
     setLoading(true);
     try {
-      await fetch(`/api/requests/${request.id}/approve`, {
+      const res = await fetch(`/api/requests/${request.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,8 +190,17 @@ export default function RequestDetailModal({
           comments: rejectReason,
         }),
       });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert("Rejection Error: " + (data.error || "Failed to reject request."));
+        return;
+      }
+      alert("Request rejected and returned to requester (Phase 1).");
       setShowRejectModal(false);
       onRefresh();
+      onClose();
+    } catch (err: any) {
+      alert("Network error: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -205,6 +292,207 @@ export default function RequestDetailModal({
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderApprovalCard = () => {
+    if (request.currentPhase !== "PHASE_2") return null;
+
+    return (
+      <div className="bg-gradient-to-br from-purple-50/90 to-blue-50/70 border-2 border-purple-200 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping" />
+            <span className="font-extrabold text-sm text-purple-950">
+              Phase 2: Review &amp; Approval Action
+            </span>
+          </div>
+          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-purple-200/80 text-purple-800">
+            {isBom ? "BOM Three-Tier SOP" : "Price & Role Routing SOP"}
+          </span>
+        </div>
+
+        {/* BOM Parts Dual-Stage Checklist */}
+        {isBom ? (
+          <div className="space-y-2 bg-white/80 p-3.5 rounded-xl border border-purple-100">
+            <div className="text-xs font-bold text-slate-800">Required Review Sign-Offs:</div>
+
+            {/* 1. Jaydeep - Technical Review */}
+            <div className="flex items-center justify-between text-xs py-1.5 border-b border-slate-100">
+              <div className="flex items-center space-x-2">
+                {hasTechApproval ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+                )}
+                <div>
+                  <div className="font-bold text-slate-800">1. Technical Review</div>
+                  <div className="text-[11px] text-slate-500">Mr. Jaydeep Panchal (R&amp;D Head)</div>
+                </div>
+              </div>
+              <span
+                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                  hasTechApproval
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                {hasTechApproval ? "Approved ✓" : "Pending ⏳"}
+              </span>
+            </div>
+
+            {/* 2. Rajesh - Business Review */}
+            <div className="flex items-center justify-between text-xs py-1.5">
+              <div className="flex items-center space-x-2">
+                {hasBusinessApproval ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+                )}
+                <div>
+                  <div className="font-bold text-slate-800">2. Cost &amp; Lead Time Review</div>
+                  <div className="text-[11px] text-slate-500">Mr. Rajesh Kumar (Business &amp; Procurement Lead)</div>
+                </div>
+              </div>
+              <span
+                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                  hasBusinessApproval
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                {hasBusinessApproval ? "Approved ✓" : "Pending ⏳"}
+              </span>
+            </div>
+          </div>
+        ) : isToolBlankPrice ? (
+          /* Tool with Blank Price */
+          <div className="space-y-2 bg-white/80 p-3.5 rounded-xl border border-purple-100">
+            <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Blank Price Evaluation Required</span>
+            </div>
+            <p className="text-[11px] text-slate-600">
+              The price was left blank by requester. As per SOP, <strong>Mr. Rajesh Kumar (Business &amp; Procurement Lead)</strong> must evaluate and fill the cost.
+            </p>
+            {(isRajesh || isAdmin) && (
+              <div className="pt-1">
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Evaluated Total Cost (₹) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="Enter evaluated cost in ₹..."
+                  value={evaluatedPrice}
+                  onChange={(e) => setEvaluatedPrice(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-purple-400 outline-hidden"
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Tool with Known Price */
+          <div className="space-y-1.5 bg-white/80 p-3.5 rounded-xl border border-purple-100">
+            <div className="text-xs font-bold text-slate-800">Authority Routing:</div>
+            <div className="text-[11px] text-slate-600">
+              Estimated Cost: <strong className="font-mono text-slate-900">₹{request.totalEstimatedCost?.toLocaleString("en-IN")}</strong>
+            </div>
+            <div className="text-[11px] text-slate-600">
+              {request.totalEstimatedCost <= 2000 ? (
+                <span>&bull; Cost &le; ₹2,000 &rarr; Assigned to <strong>Abhishek Saini (R&amp;D Team Lead)</strong></span>
+              ) : request.totalEstimatedCost <= 5000 ? (
+                <span>&bull; Cost &le; ₹5,000 &rarr; Assigned to <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong></span>
+              ) : (
+                <span>&bull; Cost &gt; ₹5,000 &rarr; Assigned to <strong>Mr. Amol Bhardwaj (CTO)</strong></span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Remarks Input */}
+        <input
+          type="text"
+          placeholder="Approval remarks (optional)..."
+          value={approvalComment}
+          onChange={(e) => setApprovalComment(e.target.value)}
+          className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl outline-hidden focus:ring-2 focus:ring-blue-400"
+        />
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => setShowRejectModal(true)}
+            className="px-3.5 py-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-300 rounded-xl hover:bg-rose-100 transition-colors"
+          >
+            ✕ Reject with Reason
+          </button>
+
+          {/* BOM Technical Button */}
+          {isBom && !hasTechApproval && (isJaydeep || isAdmin) && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleApprove("THREE_TIER_TECHNICAL")}
+              className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Approve Technical Review (Jaydeep)</span>
+            </button>
+          )}
+
+          {/* BOM Business Button */}
+          {isBom && !hasBusinessApproval && (isRajesh || isAdmin) && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleApprove("THREE_TIER_BUSINESS")}
+              className="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Approve Cost &amp; Lead Time (Rajesh)</span>
+            </button>
+          )}
+
+          {/* BOM Admin Quick Sign-Off */}
+          {isBom && isAdmin && (!hasTechApproval || !hasBusinessApproval) && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleApprove("THREE_TIER_TECHNICAL")}
+              className="px-4 py-2 text-xs font-bold text-purple-900 bg-purple-100 hover:bg-purple-200 border border-purple-300 rounded-xl transition-colors"
+            >
+              Admin Sign-Off &rarr; Sourcing
+            </button>
+          )}
+
+          {/* Tool Blank Price Evaluation Button */}
+          {isToolBlankPrice && (isRajesh || isAdmin) && (
+            <button
+              type="button"
+              disabled={loading || !evaluatedPrice}
+              onClick={() => handleApprove("PRICE_EVALUATION", parseFloat(evaluatedPrice))}
+              className="px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Submit Cost &amp; Authorize Request</span>
+            </button>
+          )}
+
+          {/* Tool Regular Threshold Approval Button */}
+          {!isBom && !isToolBlankPrice && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleApprove("PRICE_ROUTING")}
+              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Authorize &amp; Send to Sourcing (Phase 3)</span>
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -469,6 +757,8 @@ export default function RequestDetailModal({
                     )}
                   </div>
                 </div>
+              ) : request.currentPhase === "PHASE_2" ? (
+                renderApprovalCard()
               ) : (
                 <div className="bg-blue-50/60 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 space-y-1">
                   <div className="font-bold">Next Action Required:</div>
@@ -499,17 +789,30 @@ export default function RequestDetailModal({
                   <div className="text-slate-600">{it.partName}</div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
                     <span>Unit Price: &#8377;{it.finalUnitPrice || it.estimatedUnitPrice || "0"}</span>
-                    {it.datasheetUrl && (
-                      <a
-                        href={it.datasheetUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 hover:underline flex items-center gap-0.5"
-                      >
-                        <FileText className="w-3 h-3" />
-                        <span>View Datasheet</span>
-                      </a>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {it.datasheetUrl && (
+                        <a
+                          href={it.datasheetUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:underline flex items-center gap-0.5"
+                        >
+                          <FileText className="w-3 h-3" />
+                          <span>View Datasheet</span>
+                        </a>
+                      )}
+                      {it.optionalSource && (
+                        <a
+                          href={it.optionalSource.startsWith("http") ? it.optionalSource : `https://${it.optionalSource}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-purple-600 hover:underline flex items-center gap-0.5"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Source URL</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -520,38 +823,7 @@ export default function RequestDetailModal({
           {activeTab === "actions" && (
             <div className="space-y-4">
               {/* Phase 2 Approvals */}
-              {request.currentPhase === "PHASE_2" && (
-                <div className="bg-purple-50/70 border border-purple-200 rounded-2xl p-4 space-y-3">
-                  <div className="font-bold text-purple-900 text-sm">
-                    Phase 2: Review &amp; Approval Routing
-                  </div>
-                  <p className="text-slate-600 text-xs">
-                    Authorize or reject this request based on SOP authority matrices.
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="Approval comments (optional)..."
-                    value={approvalComment}
-                    onChange={(e) => setApprovalComment(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl"
-                  />
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      onClick={() => setShowRejectModal(true)}
-                      className="px-4 py-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-300 rounded-xl hover:bg-rose-100"
-                    >
-                      Reject with Reason
-                    </button>
-                    <button
-                      onClick={handleApprove}
-                      disabled={loading}
-                      className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs"
-                    >
-                      Approve &amp; Send to Sourcing
-                    </button>
-                  </div>
-                </div>
-              )}
+              {request.currentPhase === "PHASE_2" && renderApprovalCard()}
 
               {/* Phase 3 PO Issuance */}
               {request.currentPhase === "PHASE_3" && (
