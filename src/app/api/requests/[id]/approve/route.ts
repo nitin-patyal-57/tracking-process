@@ -103,7 +103,10 @@ export async function POST(
     });
 
     let canMoveToPhase3 = false;
-    const isAdmin = approver.role === "ADMIN" || approver.id === "user_admin";
+    const isAdmin =
+      approver.role === "ADMIN" ||
+      approver.id === "user_admin" ||
+      approver.id === "user_amol";
 
     if (isAdmin) {
       canMoveToPhase3 = true;
@@ -112,12 +115,14 @@ export async function POST(
         (a) =>
           a.stage === "THREE_TIER_TECHNICAL" ||
           a.approverId === "user_jaydeep" ||
+          a.approverId === "user_amol" ||
           a.approverId === "user_admin"
       );
       const hasBiz = allApprovals.some(
         (a) =>
           a.stage === "THREE_TIER_BUSINESS" ||
           a.approverId === "user_business" ||
+          a.approverId === "user_amol" ||
           a.approverId === "user_admin"
       );
       if (hasTech && hasBiz) {
@@ -149,12 +154,14 @@ export async function POST(
         (a) =>
           a.stage === "THREE_TIER_TECHNICAL" ||
           a.approverId === "user_jaydeep" ||
+          a.approverId === "user_amol" ||
           a.approverId === "user_admin"
       );
       const hasBiz = allApprovals.some(
         (a) =>
           a.stage === "THREE_TIER_BUSINESS" ||
           a.approverId === "user_business" ||
+          a.approverId === "user_amol" ||
           a.approverId === "user_admin"
       );
 

@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Setting up Walnut Medical System Users without deleting existing data...");
+  console.log("Setting up Walnut Medical System Users (4 Core Leaders) without deleting existing data...");
 
   // Safely ensure no other record has conflicting unique emails
   try {
@@ -17,10 +17,22 @@ async function main() {
         isActive: false,
       },
     });
+
+    await prisma.user.updateMany({
+      where: {
+        email: "admin@walnutmedical.com",
+        id: { not: "user_amol" },
+      },
+      data: {
+        email: "old_admin_archive@walnutmedical.com",
+        isActive: false,
+      },
+    });
   } catch (e) {
     // Non-fatal if table empty or no match
   }
 
+  // Walnut Medical 4 Core Team Members (Admin merged with CTO Mr. Amol Bhardwaj)
   const users = [
     {
       id: "user_abhishek",
@@ -47,9 +59,9 @@ async function main() {
       name: "Mr. Amol Bhardwaj",
       email: "amol.bhardwaj@walnutmedical.com",
       password: "Walnut@2026",
-      role: "APPROVER_TIER3",
-      designation: "Chief Technology Officer (CTO)",
-      department: "Executive",
+      role: "ADMIN",
+      designation: "Chief Technology Officer (CTO) & System Administrator",
+      department: "Executive & Administration",
       isActive: true,
     },
     {
@@ -60,16 +72,6 @@ async function main() {
       role: "BUSINESS",
       designation: "Business, Procurement & Store Lead",
       department: "Purchase, Procurement & Store Operations",
-      isActive: true,
-    },
-    {
-      id: "user_admin",
-      name: "Walnut Admin",
-      email: "admin@walnutmedical.com",
-      password: "Walnut@2026",
-      role: "ADMIN",
-      designation: "System Administrator",
-      department: "Administration",
       isActive: true,
     },
   ];
@@ -83,13 +85,13 @@ async function main() {
     });
   }
 
-  // Deactivate old or superseded user IDs without deleting foreign key references
+  // Deactivate old, removed or merged user IDs without deleting foreign key references
   await prisma.user.updateMany({
-    where: { id: { in: ["user_store", "user_rajesh", "user_abhishek_dir"] } },
+    where: { id: { in: ["user_store", "user_rajesh", "user_abhishek_dir", "user_admin"] } },
     data: { isActive: false },
   });
 
-  console.log(`Created or updated ${users.length} active system users. Existing request history was preserved.`);
+  console.log(`Created or updated ${users.length} active system users. Walnut Admin successfully merged into Mr. Amol Bhardwaj.`);
 }
 
 main()

@@ -87,14 +87,18 @@ export default function RequestDetailModal({
       a.stage === "THREE_TIER_TECHNICAL" ||
       a.approverId === "user_jaydeep" ||
       a.approver?.name?.toLowerCase().includes("jaydeep") ||
-      a.approverId === "user_admin"
+      a.approverId === "user_amol" ||
+      a.approverId === "user_admin" ||
+      a.approver?.name?.toLowerCase().includes("amol")
   );
   const hasBusinessApproval = approvedLogs.some(
     (a: any) =>
       a.stage === "THREE_TIER_BUSINESS" ||
       a.approverId === "user_business" ||
       a.approver?.name?.toLowerCase().includes("rajesh") ||
-      a.approverId === "user_admin"
+      a.approverId === "user_amol" ||
+      a.approverId === "user_admin" ||
+      a.approver?.name?.toLowerCase().includes("amol")
   );
 
   const isJaydeep =
@@ -115,9 +119,14 @@ export default function RequestDetailModal({
   const isAmol =
     currentUser.id === "user_amol" ||
     currentUser.role === "APPROVER_TIER3" ||
+    currentUser.role === "ADMIN" ||
     currentUser.name?.toLowerCase().includes("amol");
 
-  const isAdmin = currentUser.role === "ADMIN" || currentUser.id === "user_admin";
+  const isAdmin =
+    currentUser.role === "ADMIN" ||
+    currentUser.id === "user_admin" ||
+    currentUser.id === "user_amol" ||
+    isAmol;
 
   const isAbhishekRequester =
     request.requesterId === "user_abhishek" ||
@@ -469,7 +478,7 @@ export default function RequestDetailModal({
             </button>
           )}
 
-          {/* BOM Admin Quick Sign-Off */}
+          {/* BOM Admin / CTO Quick Sign-Off */}
           {isBom && isAdmin && (!hasTechApproval || !hasBusinessApproval) && (
             <button
               type="button"
@@ -477,7 +486,7 @@ export default function RequestDetailModal({
               onClick={() => handleApprove("THREE_TIER_TECHNICAL")}
               className="px-4 py-2 text-xs font-bold text-purple-900 bg-purple-100 hover:bg-purple-200 border border-purple-300 rounded-xl transition-colors"
             >
-              Admin Sign-Off &rarr; Sourcing
+              CTO &amp; Admin Sign-Off &rarr; Sourcing
             </button>
           )}
 

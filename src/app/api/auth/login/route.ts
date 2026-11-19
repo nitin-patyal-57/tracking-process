@@ -28,9 +28,9 @@ const DEFAULT_USERS = [
     name: "Mr. Amol Bhardwaj",
     email: "amol.bhardwaj@walnutmedical.com",
     password: "Walnut@2026",
-    role: "APPROVER_TIER3",
-    designation: "Chief Technology Officer (CTO)",
-    department: "Executive",
+    role: "ADMIN",
+    designation: "Chief Technology Officer (CTO) & System Administrator",
+    department: "Executive & Administration",
     isActive: true,
   },
   {
@@ -41,16 +41,6 @@ const DEFAULT_USERS = [
     role: "BUSINESS",
     designation: "Business, Procurement & Store Lead",
     department: "Purchase, Procurement & Store Operations",
-    isActive: true,
-  },
-  {
-    id: "user_admin",
-    name: "Walnut Admin",
-    email: "admin@walnutmedical.com",
-    password: "Walnut@2026",
-    role: "ADMIN",
-    designation: "System Administrator",
-    department: "Administration",
     isActive: true,
   },
 ];
@@ -110,15 +100,15 @@ export async function POST(req: NextRequest) {
       rawClean === "mr. jaydeep panchal" ||
       noSpaces.includes("jaydeep");
 
-    const isAmol =
+    // Amol Bhardwaj has both CTO & Administrator access merged
+    const isAmolOrAdmin =
       rawClean === "amol" ||
       rawClean === "mr. amol" ||
       rawClean === "mr. amol bhardwaj" ||
-      noSpaces.includes("amol");
-
-    const isAdmin =
       rawClean === "admin" ||
       rawClean === "walnut admin" ||
+      rawClean === "admin@walnutmedical.com" ||
+      noSpaces.includes("amol") ||
       noSpaces.includes("admin");
 
     // Look up by email, ID, alias, or normalized string
@@ -133,16 +123,15 @@ export async function POST(req: NextRequest) {
           { name: { equals: rawClean } },
           ...(isAbhishek ? [{ id: "user_abhishek" }, { email: "abhishek.saini@walnutmedical.com" }] : []),
           ...(isJaydeep ? [{ id: "user_jaydeep" }, { email: "jaydeep.panchal@walnutmedical.com" }] : []),
-          ...(isAmol ? [{ id: "user_amol" }, { email: "amol.bhardwaj@walnutmedical.com" }] : []),
+          ...(isAmolOrAdmin ? [{ id: "user_amol" }, { email: "amol.bhardwaj@walnutmedical.com" }] : []),
           ...(isRajesh ? [{ id: "user_business" }, { email: "rajesh.kumar@walnutmedical.com" }] : []),
-          ...(isAdmin ? [{ id: "user_admin" }, { email: "admin@walnutmedical.com" }] : []),
         ],
       },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: "Account not found with this email or ID. Default users: abhishek.saini@walnutmedical.com, rajesh.kumar@walnutmedical.com, jaydeep.panchal@walnutmedical.com, amol.bhardwaj@walnutmedical.com, admin@walnutmedical.com" },
+        { error: "Account not found with this email or ID. Active accounts: abhishek.saini@walnutmedical.com, rajesh.kumar@walnutmedical.com, jaydeep.panchal@walnutmedical.com, amol.bhardwaj@walnutmedical.com" },
         { status: 401 }
       );
     }

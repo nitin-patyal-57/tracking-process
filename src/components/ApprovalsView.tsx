@@ -104,7 +104,7 @@ export default function ApprovalsView({
     }
     return (
       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">
-        Tier 3 Approval (Mr. Amol Bhardwaj - CTO)
+        Tier 3 Approval (Mr. Amol Bhardwaj - CTO &amp; Admin)
       </span>
     );
   };

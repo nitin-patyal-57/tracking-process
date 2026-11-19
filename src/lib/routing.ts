@@ -122,8 +122,8 @@ export function determineApprovalRouting(
     {
       assignedApproverId: "user_amol",
       assignedApproverName: "Mr. Amol Bhardwaj",
-      assignedRoleName: "Chief Technology Officer (CTO)",
-      ruleExplanation: `Price & Role Routing: Total cost (${cost.toLocaleString("en-IN")}) is > ₹ / $ 5,000. Assigned to Mr. Amol Bhardwaj (CTO).`,
+      assignedRoleName: "CTO & System Administrator",
+      ruleExplanation: `Price & Role Routing: Total cost (${cost.toLocaleString("en-IN")}) is > ₹ / $ 5,000. Assigned to Mr. Amol Bhardwaj (CTO & Administrator).`,
       stage: "PRICE_ROUTING",
     },
   ];

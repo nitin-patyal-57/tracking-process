@@ -72,10 +72,10 @@ export default function TopHeader({
     REQUESTER: "Requester",
     APPROVER_TIER1: "Approver · Tier 1",
     APPROVER_TIER2: "Approver · Tier 2",
-    APPROVER_TIER3: "Approver · Tier 3",
-    BUSINESS: "Business",
+    APPROVER_TIER3: "CTO & Administrator",
+    BUSINESS: "Business & Store Lead",
     STORE_QA: "Store QA",
-    ADMIN: "Administrator",
+    ADMIN: "CTO & Administrator",
   };
   const roleLabel =
     (currentUser?.role && roleLabels[currentUser.role]) ||
