@@ -60,13 +60,14 @@ export default function TopHeader({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Compute initials
-  const initials = currentUser.name
-    .split(" ")
+  // Compute initials safely
+  const initials = (currentUser?.name || "WM")
+    .split(/\s+/)
+    .filter(Boolean)
     .map((n) => n[0])
     .slice(0, 2)
     .join("")
-    .toUpperCase();
+    .toUpperCase() || "WM";
   const roleLabels: Record<string, string> = {
     REQUESTER: "Requester",
     APPROVER_TIER1: "Approver · Tier 1",
@@ -76,7 +77,9 @@ export default function TopHeader({
     STORE_QA: "Store QA",
     ADMIN: "Administrator",
   };
-  const roleLabel = roleLabels[currentUser.role] || currentUser.role.replace(/_/g, " ");
+  const roleLabel =
+    (currentUser?.role && roleLabels[currentUser.role]) ||
+    (currentUser?.role ? currentUser.role.replace(/_/g, " ") : "Member");
 
   // Dynamic alerts computed from requests per SOP WMPL-QAS-025-01A
   const notifications = useMemo(() => {
@@ -338,7 +341,7 @@ export default function TopHeader({
             }}
             aria-expanded={dropdownOpen}
             aria-haspopup="true"
-            aria-label={`Profile menu for ${currentUser.name}`}
+            aria-label={`Profile menu for ${currentUser?.name || "User"}`}
             className={`flex items-center gap-2 rounded-2xl border px-2 py-1.5 text-left transition-all ${
               dropdownOpen
                 ? "border-blue-200 bg-blue-50/70 shadow-sm"
@@ -353,10 +356,10 @@ export default function TopHeader({
             {/* Name & Designation */}
             <div className="hidden sm:block">
               <div className="text-xs font-bold leading-tight text-slate-900">
-                {currentUser.name}
+                {currentUser?.name || "User"}
               </div>
               <div className="mt-0.5 max-w-36 truncate text-[10px] leading-tight text-slate-500">
-                {currentUser.designation}
+                {currentUser?.designation || ""}
               </div>
             </div>
 
@@ -379,20 +382,20 @@ export default function TopHeader({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-bold text-slate-900">
-                      {currentUser.name}
+                      {currentUser?.name || "User"}
                     </div>
                     <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-slate-500">
                       <Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                      <span className="truncate">{currentUser.email}</span>
+                      <span className="truncate">{currentUser?.email || ""}</span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <span className="truncate text-xs font-medium text-slate-600">
-                    {currentUser.designation}
+                    {currentUser?.designation || ""}
                   </span>
                   <span className="shrink-0 rounded-full border border-blue-100 bg-white/80 px-2.5 py-1 text-[10px] font-semibold text-blue-700">
-                    {currentUser.department}
+                    {currentUser?.department || ""}
                   </span>
                 </div>
               </div>

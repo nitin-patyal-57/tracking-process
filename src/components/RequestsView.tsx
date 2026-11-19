@@ -147,7 +147,7 @@ export default function RequestsView({
                     {r.requestNumber}
                   </td>
                   <td className="py-3.5 px-4 font-semibold text-slate-900">
-                    <div className="font-bold">{r.title.split("-")[0]?.trim() || r.title}</div>
+                    <div className="font-bold">{(r.title || "").split("-")[0]?.trim() || r.title || "Procurement Request"}</div>
                     <div className="text-[11px] text-slate-500 truncate max-w-xs">{r.justification}</div>
                   </td>
                   <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap">

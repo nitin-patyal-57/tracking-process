@@ -403,7 +403,7 @@ export default function RequestDetailModal({
               Estimated Cost: <strong className="font-mono text-slate-900">₹{request.totalEstimatedCost?.toLocaleString("en-IN")}</strong>
             </div>
             <div className="text-[11px] text-slate-600">
-              {request.totalEstimatedCost <= 2000 ? (
+              {request.totalEstimatedCost != null && request.totalEstimatedCost <= 2000 ? (
                 isAbhishekRequester ? (
                   <span>
                     &bull; Cost &le; ₹2,000 requested by Abhishek Saini &rarr;{" "}
@@ -413,10 +413,12 @@ export default function RequestDetailModal({
                 ) : (
                   <span>&bull; Cost &le; ₹2,000 &rarr; Assigned to <strong>Abhishek Saini (R&amp;D Team Lead)</strong></span>
                 )
-              ) : request.totalEstimatedCost <= 5000 ? (
+              ) : request.totalEstimatedCost != null && request.totalEstimatedCost <= 5000 ? (
                 <span>&bull; Cost &le; ₹5,000 &rarr; Assigned to <strong>Mr. Jaydeep Panchal (R&amp;D Head)</strong></span>
-              ) : (
+              ) : request.totalEstimatedCost != null ? (
                 <span>&bull; Cost &gt; ₹5,000 &rarr; Assigned to <strong>Mr. Amol Bhardwaj (CTO)</strong></span>
+              ) : (
+                <span>&bull; Price Evaluation required by <strong>Mr. Rajesh Kumar (Business Team)</strong></span>
               )}
             </div>
           </div>
@@ -494,7 +496,7 @@ export default function RequestDetailModal({
 
           {/* Tool Regular Threshold Approval or Abhishek Auto-Approval Button */}
           {!isBom && !isToolBlankPrice && (
-            isAbhishekRequester && request.totalEstimatedCost <= 2000 ? (
+            isAbhishekRequester && request.totalEstimatedCost != null && request.totalEstimatedCost <= 2000 ? (
               (isAbhishek || isAdmin) && (
                 <button
                   type="button"

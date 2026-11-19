@@ -2,6 +2,76 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, createSessionToken } from "@/lib/auth";
 
+const DEFAULT_USERS = [
+  {
+    id: "user_abhishek",
+    name: "Abhishek Saini",
+    email: "abhishek.saini@walnutmedical.com",
+    password: "Walnut@2026",
+    role: "APPROVER_TIER1",
+    designation: "R&D Team Lead",
+    department: "R&D",
+    isActive: true,
+  },
+  {
+    id: "user_jaydeep",
+    name: "Mr. Jaydeep Panchal",
+    email: "jaydeep.panchal@walnutmedical.com",
+    password: "Walnut@2026",
+    role: "APPROVER_TIER2",
+    designation: "R&D Head",
+    department: "R&D",
+    isActive: true,
+  },
+  {
+    id: "user_amol",
+    name: "Mr. Amol Bhardwaj",
+    email: "amol.bhardwaj@walnutmedical.com",
+    password: "Walnut@2026",
+    role: "APPROVER_TIER3",
+    designation: "Chief Technology Officer (CTO)",
+    department: "Executive",
+    isActive: true,
+  },
+  {
+    id: "user_business",
+    name: "Mr. Rajesh Kumar",
+    email: "rajesh.kumar@walnutmedical.com",
+    password: "Walnut@2026",
+    role: "BUSINESS",
+    designation: "Business, Procurement & Store Lead",
+    department: "Purchase, Procurement & Store Operations",
+    isActive: true,
+  },
+  {
+    id: "user_admin",
+    name: "Walnut Admin",
+    email: "admin@walnutmedical.com",
+    password: "Walnut@2026",
+    role: "ADMIN",
+    designation: "System Administrator",
+    department: "Administration",
+    isActive: true,
+  },
+];
+
+async function ensureDefaultUsers() {
+  try {
+    const count = await prisma.user.count({ where: { isActive: true } });
+    if (count === 0) {
+      for (const u of DEFAULT_USERS) {
+        await prisma.user.upsert({
+          where: { id: u.id },
+          create: u,
+          update: { ...u, isActive: true },
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Auto-seed error:", err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -13,6 +83,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Auto-seed if database is fresh/empty
+    await ensureDefaultUsers();
 
     const rawClean = String(email).trim().toLowerCase();
     const noSpaces = rawClean.replace(/\s+/g, "");
@@ -69,7 +142,7 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Account not found with this email or ID." },
+        { error: "Account not found with this email or ID. Default users: abhishek.saini@walnutmedical.com, rajesh.kumar@walnutmedical.com, jaydeep.panchal@walnutmedical.com, amol.bhardwaj@walnutmedical.com, admin@walnutmedical.com" },
         { status: 401 }
       );
     }

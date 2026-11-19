@@ -317,7 +317,7 @@ export default function DashboardView({
                         {req.requestNumber}
                       </td>
                       <td className="py-3.5 px-3 font-semibold text-slate-900 whitespace-nowrap">
-                        {req.title.split("-")[0]?.trim() || req.title}
+                        {(req.title || "").split("-")[0]?.trim() || req.title || "Procurement Request"}
                       </td>
                       <td className="py-3.5 px-3 text-slate-500 whitespace-nowrap">
                         {req.requestType === "BOM_PARTS" ? "BOM Parts" : "Tool / Equipment"}

@@ -190,7 +190,7 @@ export default function ApprovalsView({
                       <span>{req.requestNumber}</span>
                       <span className="text-slate-400 font-normal">&ndash;</span>
                       <span className="font-semibold text-slate-700">
-                        {req.title.split("-")[0]?.trim() || req.title}
+                        {(req.title || "").split("-")[0]?.trim() || req.title || "Procurement Request"}
                       </span>
                     </div>
 
